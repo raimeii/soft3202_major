@@ -46,16 +46,16 @@ public class ShoppingBasketTest {
     }
 
     @Test 
-    public void nonIntAdd() {
+    public void zeroAdd() {
         assertThrows(IllegalArgumentException.class, ()-> {
-            sb.addItem("pear", 1.5);
+            sb.addItem("pear", 0);
         });
     }
 
     @Test 
-    public void nonNumberAdd() {
+    public void negativeAdd() {
         assertThrows(IllegalArgumentException.class, ()-> {
-            sb.addItem("banana", "two");
+            sb.addItem("banana", -1);
         });
     }
 
@@ -68,7 +68,7 @@ public class ShoppingBasketTest {
     @Test
     public void mixcaseAdd() {
         sb.addItem("Apple", 1);
-        assertEquals(2.50, sb.getValue);
+        assertEquals(2.50, sb.getValue());
     }
 
     //test removeItem
@@ -99,7 +99,7 @@ public class ShoppingBasketTest {
     }
 
     @Test 
-    public void nonIntRemove() {
+    public void zeroRemove() {
         sb.addItem("orange", 5);
         assertThrows(IllegalArgumentException.class, () -> {
             sb.removeItem("orange", 2.75);
@@ -107,10 +107,10 @@ public class ShoppingBasketTest {
     }
 
     @Test 
-    public void nonNumberRemove() {
+    public void negativeRemove() {
         sb.addItem("orange", 5);
         assertThrows(IllegalArgumentException.class, () -> {
-            sb.removeItem("orange", "two and three quarters");
+            sb.removeItem("orange", -1);
         });
     }
 
