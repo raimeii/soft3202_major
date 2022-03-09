@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 - get item list of empty cart
 - clear empty cart behaviour
 - if pair list is initialized or not at shoppingbasket creation
+- adding/removing null strings
 
 confirmed undefined behaviour
 - items being deleted from pair list when number = 0
@@ -39,9 +40,9 @@ public class ShoppingBasketTest {
     }
 
     @Test 
-    public void nullStringAdd() {
+    public void nullZeroAdd() {
         assertThrows(IllegalArgumentException.class, ()-> {
-            sb.addItem(null, 1);
+            sb.addItem(null, 0);
         });
     }
 
@@ -67,7 +68,7 @@ public class ShoppingBasketTest {
 
     @Test
     public void mixcaseAdd() {
-        sb.addItem("Apple", 1);
+        sb.addItem("ApplE", 1);
         assertEquals(2.50, sb.getValue());
     }
 
@@ -91,18 +92,22 @@ public class ShoppingBasketTest {
     }
 
     @Test 
+    public void notValidItemRemove() {
+        sb.addItem("orange", 5);
+        assertFalse(sb.removeItem("dragonfruit", 20));
+    }
+
+    @Test 
     public void nullStringRemove() {
         sb.addItem("orange", 5);
-        assertThrows(IllegalArgumentException.class, () -> {
-            sb.removeItem(null, 1);
-        });
+        assertFalse(sb.removeItem(null, 20));
     }
 
     @Test 
     public void zeroRemove() {
         sb.addItem("orange", 5);
         assertThrows(IllegalArgumentException.class, () -> {
-            sb.removeItem("orange", 2.75);
+            sb.removeItem("orange", 0);
         });
     }
 
@@ -133,6 +138,14 @@ public class ShoppingBasketTest {
     public void wrongSpelling() {
         sb.addItem("apple", 2);
         assertFalse(sb.removeItem("apples", 1));
+    }
+
+    @Test
+    public void nullNegativeParam() {
+        sb.addItem("apple", 1);
+        assertThrows(IllegalArgumentException.class, () -> {
+            sb.removeItem(null, -1);
+        });
     }
 
     //test getItems
