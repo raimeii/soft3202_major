@@ -72,6 +72,13 @@ public class ShoppingBasketTest {
         assertEquals(2.50, sb.getValue());
     }
 
+    @Test
+    public void nullNegativeAdd() {
+        assertThrows(IllegalArgumentException.class, ()-> {
+            sb.addItem(null, -20);
+        });
+    }
+
     //test removeItem
     @Test
     public void removeNothing() {
