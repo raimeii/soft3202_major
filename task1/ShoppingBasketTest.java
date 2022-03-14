@@ -39,6 +39,12 @@ public class ShoppingBasketTest {
         assertEquals(2.50, sb.getValue());
     }
 
+    @Test
+    public void limitTestingAdd() {
+        sb.addItem("orange", 2,147,483,647);
+        assertEquals(2684354558.75, sb.getValue());
+    }
+
     @Test 
     public void nullZeroAdd() {
         assertThrows(IllegalArgumentException.class, ()-> {
@@ -84,6 +90,13 @@ public class ShoppingBasketTest {
     public void removeNothing() {
         assertFalse(sb.removeItem("apple", 1));
     }
+
+    @Test
+    public void limitTestingRemoves() {
+        sb.addItem("orange", 2,147,483,647);
+        sb.removeItem("orange", 2,147,483,646);
+        assertEquals(1.25, sb.getValue());
+    }
     
     @Test
     public void removeOverContents() {
@@ -102,12 +115,15 @@ public class ShoppingBasketTest {
     public void notValidItemRemove() {
         sb.addItem("orange", 5);
         assertFalse(sb.removeItem("dragonfruit", 20));
+        assertEquals(6.25, sb.getValue());
     }
 
     @Test 
     public void nullStringRemove() {
         sb.addItem("orange", 5);
-        assertFalse(sb.removeItem(null, 20));
+        assertThrows(IllegalArgumentException.class, () -> {
+            sb.removeItem(null, 1);
+        });
     }
 
     @Test 
@@ -164,6 +180,12 @@ public class ShoppingBasketTest {
         assertEquals(2, sb.getItems().size());
     }
 
+    @Test
+    public void emptyGetItems() {
+        assertNotNull(sb.getItems());
+        assertEquals(0, sb.getItems().size());
+    }
+
     //test getValue 
     @Test
     public void normalGetValue() {
@@ -191,8 +213,7 @@ public class ShoppingBasketTest {
         sb.addItem("apple", 10);
         sb.clear();
         sb.addItem("pear", 10);
+        assertFalse(sb.removeItem("apple", 10));
         assertEquals(30.0, sb.getValue());
     }
-
-
 }
