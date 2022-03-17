@@ -41,7 +41,7 @@ public class ShoppingBasketTest {
 
     @Test
     public void limitTestingAdd() {
-        sb.addItem("orange", 2,147,483,647);
+        sb.addItem("orange", 2147483647);
         assertEquals(2684354558.75, sb.getValue());
     }
 
@@ -63,6 +63,13 @@ public class ShoppingBasketTest {
     public void negativeAdd() {
         assertThrows(IllegalArgumentException.class, ()-> {
             sb.addItem("banana", -1);
+        });
+    }
+
+    @Test 
+    public void notInChoicesAdd() {
+        assertThrows(IllegalArgumentException.class, ()-> {
+            sb.addItem("pineapple", 1);
         });
     }
 
@@ -93,8 +100,8 @@ public class ShoppingBasketTest {
 
     @Test
     public void limitTestingRemoves() {
-        sb.addItem("orange", 2,147,483,647);
-        sb.removeItem("orange", 2,147,483,646);
+        sb.addItem("orange", 2147483647);
+        sb.removeItem("orange", 2147483646);
         assertEquals(1.25, sb.getValue());
     }
     
@@ -119,14 +126,6 @@ public class ShoppingBasketTest {
     }
 
     @Test 
-    public void nullStringRemove() {
-        sb.addItem("orange", 5);
-        assertThrows(IllegalArgumentException.class, () -> {
-            sb.removeItem(null, 1);
-        });
-    }
-
-    @Test 
     public void zeroRemove() {
         sb.addItem("orange", 5);
         assertThrows(IllegalArgumentException.class, () -> {
@@ -140,6 +139,12 @@ public class ShoppingBasketTest {
         assertThrows(IllegalArgumentException.class, () -> {
             sb.removeItem("orange", -1);
         });
+    }
+
+    @Test 
+    public void nullRemove() {
+        sb.addItem("orange", 1);
+        assertFalse(sb.removeItem(null, 1));
     }
 
     @Test
@@ -177,13 +182,11 @@ public class ShoppingBasketTest {
         sb.addItem("apple", 5);
         sb.addItem("orange", 10);
         assertNotNull(sb.getItems());
-        assertEquals(2, sb.getItems().size());
     }
 
     @Test
     public void emptyGetItems() {
         assertNotNull(sb.getItems());
-        assertEquals(0, sb.getItems().size());
     }
 
     //test getValue 
