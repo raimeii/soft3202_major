@@ -5,6 +5,7 @@ import au.edu.sydney.soft3202.reynholm.erp.cheatmodule.ERPCheatFactory;
 //import cheatmodule.ERPCheatFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.stubbing.OngoingStubbing;
 import project.Project;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -13,8 +14,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.*;
 
 import java.lang.IllegalStateException;
 import java.lang.IllegalArgumentException;
@@ -61,5 +61,25 @@ public class BSFacadeImplTest {
             //then
             assertThat(p, equalTo(myProjectMock));
         }
+    }
+
+    //test findProjectId()
+    @Test
+    public void findProjectIdNormal() {
+        //given
+        Project myProjectMock = mock(Project.class);
+        when(myProjectMock.getId()).thenReturn(69);
+
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+        //when
+        // You need to place your code that uses makeProject (i.e. BSFacade.addProject) in this try-with-resources block
+
+        BSFacadeImpl fixture = new BSFacadeImpl();
+        Project p = fixture.addProject("Project A", "Rai Mei", 1, 50);
+
+        //then
+        assertEquals(69, fixture.findProjectID("Project A", "Rai Mei"));
     }
 }
