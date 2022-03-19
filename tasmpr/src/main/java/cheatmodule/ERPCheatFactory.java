@@ -5,7 +5,11 @@ import permissions.AuthorisationModule;
 
 public class ERPCheatFactory {
 
-    public AuthenticationModule getAuthenticationModule();
+    public AuthenticationModule getAuthenticationModule() {
+        return null;
+    }
 
-    public AuthorisationModule getAuthorisationModule();
+    public AuthorisationModule getAuthorisationModule() {
+        return null;
+    }
 }

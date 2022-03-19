@@ -19,6 +19,7 @@ import static org.mockito.Mockito.*;
 
 import java.lang.IllegalStateException;
 import java.lang.IllegalArgumentException;
+import java.util.List;
 
 public class BSFacadeImplTest {
 
@@ -173,7 +174,7 @@ public class BSFacadeImplTest {
         //when
         //set specifics for the static mock to ensure that addProject works. then compare to myProjectMock
         try (MockedStatic<Project> mock = mockStatic(Project.class)) {
-            mock.when(() -> Project.makeProject(anyInt(), anyString(), 50, 5))
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
                     .thenReturn(myProjectMock);
 
             Project p = fixture.addProject("A renovation", "Mr. X", 50, 55);
@@ -711,6 +712,156 @@ public class BSFacadeImplTest {
 
             //then
             assertEquals(69, fixture.findProjectID("Project A", "Rai Mei"));
+        }
+    }
+
+    @Test
+    public void searchProjectsNullClient() {
+        assertThrows(IllegalArgumentException.class, () -> fixture.searchProjects(null));
+    }
+
+    @Test
+    public void searchProjectsNormal() {
+        //given
+        Project myProjectMock = mock(Project.class);
+
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+            //when
+            fixture.addProject("Project A", "Mr Shelby", 30, 50);
+            fixture.addProject("Project B", "Mr Shelby", 30, 50);
+            fixture.addProject("Project C", "Mr Thorne", 25, 50);
+
+            List<Project> projectList = fixture.searchProjects("Mr Shelby");
+
+            //then
+            assertNotNull(projectList);
+            assertEquals(2, projectList.size());
+            for (Project project : projectList) {
+                assertThat(project, equalTo(myProjectMock));
+            }
+        }
+    }
+
+    @Test
+    public void searchProjectsAddRemoveSearch() {
+        //given
+        Project myProjectMock = mock(Project.class);
+        when(myProjectMock.getId()).thenReturn(20);
+
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+            //when
+            fixture.addProject("Project A", "Mr Shelby", 30, 50);
+            int p1Id = fixture.findProjectID("Project A", "Mr Shelby");
+            fixture.removeProject(p1Id);
+
+            List<Project> projectList = fixture.searchProjects("Mr Shelby");
+
+            //then
+            assertNotNull(projectList);
+            assertEquals(0, projectList.size());
+        }
+    }
+
+    @Test
+    public void searchProjectsNoMatch() {
+        //given
+        Project myProjectMock = mock(Project.class);
+
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+            //when
+            fixture.addProject("Project A", "Mr Shelby", 30, 50);
+            fixture.addProject("Project B", "Mr Shelby", 30, 50);
+            fixture.addProject("Project C", "Mr Thorne", 25, 50);
+
+            List<Project> projectList = fixture.searchProjects("Mr Gold");
+
+            //then
+            assertNotNull(projectList);
+            assertEquals(0, projectList.size());
+        }
+    }
+
+    @Test
+    public void searchProjectsCaseMismatch() {
+        //given
+        Project myProjectMock = mock(Project.class);
+
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+            //when
+            fixture.addProject("Project A", "Mr Shelby", 30, 50);
+            fixture.addProject("Project B", "Mr Shelby", 30, 50);
+            fixture.addProject("Project C", "mr thorne", 25, 50);
+
+            List<Project> projectList = fixture.searchProjects("MR THORNE");
+
+            //then
+            assertNotNull(projectList);
+            assertEquals(0, projectList.size());
+        }
+    }
+
+    //test getAllProjects()
+    @Test
+    public void getAllProjectsEmpty() {
+        List<Project> projectList = fixture.getAllProjects();
+        assertNotNull(projectList);
+        assertEquals(0, projectList.size());
+    }
+
+    @Test
+    public void getAllProjectsNormal() {
+        //given
+        Project myProjectMock = mock(Project.class);
+
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+            //when
+            fixture.addProject("Project A", "Mr Shelby", 30, 50);
+            fixture.addProject("Project B", "Mr Shelby", 30, 50);
+            fixture.addProject("Project C", "mr thorne", 25, 50);
+
+            List<Project> projectList = fixture.getAllProjects();
+
+            //then
+            assertNotNull(projectList);
+            assertEquals(3, projectList.size());
+            for (Project project : projectList) {
+                assertThat(project, equalTo(myProjectMock));
+            }
         }
     }
 }
