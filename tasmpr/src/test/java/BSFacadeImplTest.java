@@ -36,7 +36,7 @@ public class BSFacadeImplTest {
     //addProject tests
     @Test
     public void noPermsAdd() {
-        assertThrows(IllegalStateException, ()-> fixture.addProject("Building A Renovations", "Mr. X", 40.0, 50));
+        assertThrows(IllegalStateException.class, ()-> fixture.addProject("Building A Renovations", "Mr. X", 40.0, 50));
     }
 
     //Perms using cheat module
