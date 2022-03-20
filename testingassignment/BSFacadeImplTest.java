@@ -2,7 +2,9 @@ package au.edu.sydney.soft3202.reynholm.erp.billingsystem;
 import au.edu.sydney.soft3202.reynholm.erp.project.Project;
 import au.edu.sydney.soft3202.reynholm.erp.cheatmodule.ERPCheatFactory;
 import au.edu.sydney.soft3202.reynholm.erp.compliance.ComplianceReporting;
+import au.edu.sydney.soft3202.reynholm.erp.client.ClientReporting;
 
+// import client.ClientReporting;
 // import compliance.ComplianceReporting;
 // import project.Project;
 // import billingsystem.BSFacadeImpl;
@@ -10,7 +12,6 @@ import au.edu.sydney.soft3202.reynholm.erp.compliance.ComplianceReporting;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.stubbing.OngoingStubbing;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
@@ -936,7 +937,7 @@ public class BSFacadeImplTest {
     @Test
     public void auditAllCompliant() {
         Project myProjectMock = mock(Project.class);
-        when(myProjectMock.getId()).thenReturn(1, 2, 3);
+        when(myProjectMock.getId()).thenReturn(1, 1, 2, 2, 3, 3);
         when(myProjectMock.getName()).thenReturn("Project A", "Project B", "Project C");
         ComplianceReporting myComplianceMock = mock(ComplianceReporting.class);
 
@@ -954,18 +955,368 @@ public class BSFacadeImplTest {
             fixture.addProject("Project B", "Mr Shelby", 30, 50);
             fixture.addProject("Project C", "Mr Thorne", 25, 50);
 
-            int p1 = fixture.findProjectID("Project A", "Mr Shelby");
-            int p2 = fixture.findProjectID("Project B", "Mr Shelby");
-            int p3 = fixture.findProjectID("Project C", "Mr Thorne");
 
-            fixture.addTask(p1, "Project A task", 50, false);
-            fixture.addTask(p2, "Project B task", 60, false);
-            fixture.addTask(p3, "Project C task", 70, false);
+
+            fixture.addTask(fixture.findProjectID("Project A", "Mr Shelby"), "Project A task", 50, false);
+            fixture.addTask(fixture.findProjectID("Project B", "Mr Shelby"), "Project B task", 60, false);
+            fixture.addTask(fixture.findProjectID("Project C", "Mr Thorne"), "Project C task", 70, false);
+
+            fixture.audit();
+
+            //then
+            verify(myComplianceMock, never()).sendReport(anyString(), anyInt(), any());
+
+        }
+    }
+
+    @Test
+    public void auditNoneCompliant() {
+        Project myProjectMock = mock(Project.class);
+        when(myProjectMock.getId()).thenReturn(1, 1, 2, 2, 1, 1, 2, 2);
+        when(myProjectMock.getName()).thenReturn("Project A", "Project C", "Project A", "Project C");
+        ComplianceReporting myComplianceMock = mock(ComplianceReporting.class);
+
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.injectCompliance(myComplianceMock);
+        fixture.login("user", "password");
+
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+
+            fixture.addProject("Project A", "Mr Shelby", 30, 50);
+            fixture.addProject("Project C", "Mr Thorne", 25, 50);
+
+            fixture.setProjectCeiling(fixture.findProjectID("Project A", "Mr Shelby"), 20);
+            fixture.setProjectCeiling(fixture.findProjectID("Project C", "Mr Thorne"), 20);
+
+            fixture.addTask(fixture.findProjectID("Project A", "Mr Shelby"), "Project A task", 50, true);
+            fixture.addTask(fixture.findProjectID("Project C", "Mr Thorne"), "Project C task", 70, true);
+
+            fixture.audit();
+
+            verify(myComplianceMock, times(2)).sendReport(anyString(), anyInt(), any());
+        }
+    }
+
+    @Test
+    public void auditMixedCompliance() {
+        Project myProjectMock = mock(Project.class);
+        when(myProjectMock.getId()).thenReturn(1, 1, 2, 2, 1, 1, 2, 2);
+        when(myProjectMock.getName()).thenReturn("Project A", "Project C", "Project A", "Project C");
+        ComplianceReporting myComplianceMock = mock(ComplianceReporting.class);
+
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.injectCompliance(myComplianceMock);
+        fixture.login("user", "password");
+
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+
+            fixture.addProject("Project A", "Mr Shelby", 30, 50);
+            fixture.addProject("Project C", "Mr Thorne", 25, 50);
+
+            //when, project 1 and 2 in order, first round of A, C project name calls
+            fixture.setProjectCeiling(fixture.findProjectID("Project A", "Mr Shelby"), 20);
+            fixture.setProjectCeiling(fixture.findProjectID("Project C", "Mr Thorne"), 20);
+
+            //second round of 1, 2 pid calls, second round of A, C project name calls
+            fixture.addTask(fixture.findProjectID("Project A", "Mr Shelby"), "Project A task", 50, true);
+            fixture.addTask(fixture.findProjectID("Project C", "Mr Thorne"), "Project C task", 15, true);
+
+            fixture.audit();
+
+            verify(myComplianceMock, times(1)).sendReport(anyString(), anyInt(), any());
+        }
+    }
+
+    //test finalizeProject()
+
+    @Test
+    public void finalizeProjectNoInjections() {
+        assertThrows(IllegalStateException.class, () -> fixture.finaliseProject(1));
+    }
+
+    @Test
+    public void finalizeProjectNoLogin() {
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        assertThrows(IllegalStateException.class, () -> fixture.finaliseProject(1));
+    }
+
+    @Test
+    public void finalizeProjectNoClientReporting() {
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+        assertThrows(IllegalStateException.class, () -> fixture.finaliseProject(1));
+    }
+
+    @Test
+    public void finalizeProjectNoProjects() {
+        ClientReporting myClientMock = mock(ClientReporting.class);
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+        fixture.injectClient(myClientMock);
+        assertThrows(IllegalStateException.class, () -> fixture.finaliseProject(1));
+    }
+
+    @Test
+    public void finalizeProjectNoMatch() {
+        //given
+        Project myProjectMock = mock(Project.class);
+        when(myProjectMock.getId()).thenReturn(1);
+        ClientReporting myClientMock = mock(ClientReporting.class);
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+        fixture.injectClient(myClientMock);
+
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+            fixture.addProject("Project A", "Mr Shelby", 30, 50);
+            assertThrows(IllegalStateException.class, () -> fixture.finaliseProject(3));
+        }
+    }
+
+    @Test
+    public void finalizeOneProject() {
+        //given
+        Project myProjectMock = mock(Project.class);
+        when(myProjectMock.getId()).thenReturn(1);
+        when(myProjectMock.getName()).thenReturn("Project A");
+        ClientReporting myClientMock = mock(ClientReporting.class);
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+        fixture.injectClient(myClientMock);
+
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+            fixture.addProject("Project A", "Mr Shelby", 30, 50);
+            fixture.addTask(1, "Some extra task needing finishing", 20, false);
+            fixture.finaliseProject(1);
+
+            verify(myClientMock, times(1)).sendReport(eq("Mr Shelby"), anyString(), any());
+            assertEquals(0, fixture.getAllProjects().size());
+        }
+    }
+
+    @Test
+    public void finalizeNonCompliant() {
+        //given
+        Project myProjectMock = mock(Project.class);
+        when(myProjectMock.getId()).thenReturn(1);
+        when(myProjectMock.getName()).thenReturn("Project A");
+
+        ClientReporting myClientMock = mock(ClientReporting.class);
+        ComplianceReporting myComplianceMock = mock(ComplianceReporting.class);
+
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+        fixture.injectClient(myClientMock);
+        fixture.injectCompliance(myComplianceMock);
+
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+            fixture.addProject("Project A", "Mr Shelby", 30, 50);
+            fixture.setProjectCeiling(fixture.findProjectID("Project A", "Mr Shelby"), 20);
+            fixture.addTask(1, "Some extra task needing finishing", 25, true);
+            fixture.audit();
+            fixture.finaliseProject(1);
+
+            verify(myClientMock, times(1)).sendReport(eq("Mr Shelby"), anyString(), any());
+            verify(myComplianceMock, times(1)).sendReport(eq("Mr Shelby"), anyInt(), any());
+            assertEquals(0, fixture.getAllProjects().size());
+        }
+    }
+
+    //test injectAuth()
+    @Test
+    public void injectNullAuthentication() {
+        ERPCheatFactory hax = new ERPCheatFactory();
+        assertThrows(IllegalArgumentException.class, () -> fixture.injectAuth(null, hax.getAuthorisationModule()));
+    }
+
+    @Test
+    public void injectNullAuthorisation() {
+        ERPCheatFactory hax = new ERPCheatFactory();
+        assertThrows(IllegalArgumentException.class, () -> fixture.injectAuth(hax.getAuthenticationModule(), null));
+    }
+
+    @Test
+    public void unsetAuthModules() {
+        //given
+        Project myProjectMock = mock(Project.class);
+        when(myProjectMock.getId()).thenReturn(10);
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+
+
+        //when
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+            // You need to place your code that uses makeProject (i.e. BSFacade.addProject) in this try-with-resources block
+            Project p = fixture.addProject("A renovation", "Mr. X", 1, 50);
+
+            //then
+            assertThat(p, equalTo(myProjectMock));
+            assertEquals(1, fixture.getAllProjects().size());
+
+            fixture.injectAuth(null, null);
+
+            assertThrows(IllegalStateException.class, () -> fixture.removeProject(10));
+        }
+    }
+
+    //test injectCompliance()
+    @Test
+    public void unsetCompliance() {
+        Project myProjectMock = mock(Project.class);
+        when(myProjectMock.getId()).thenReturn(1, 1, 2, 2, 3, 3);
+        when(myProjectMock.getName()).thenReturn("Project A", "Project B", "Project C");
+        ComplianceReporting myComplianceMock = mock(ComplianceReporting.class);
+
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.injectCompliance(myComplianceMock);
+        fixture.login("user", "password");
+
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+            //when
+            fixture.addProject("Project A", "Mr Shelby", 30, 50);
+            fixture.addProject("Project B", "Mr Shelby", 30, 50);
+            fixture.addProject("Project C", "Mr Thorne", 25, 50);
+
+            fixture.addTask(fixture.findProjectID("Project A", "Mr Shelby"), "Project A task", 50, false);
+            fixture.addTask(fixture.findProjectID("Project B", "Mr Shelby"), "Project B task", 60, false);
+            fixture.addTask(fixture.findProjectID("Project C", "Mr Thorne"), "Project C task", 70, false);
 
             fixture.audit();
 
             verify(myComplianceMock, never()).sendReport(anyString(), anyInt(), any());
 
+            //subsequent getId/Name will now only return 3/Project C
+            fixture.addTask(fixture.findProjectID("Project C", "Mr Thorne"), "Project C extra task", 90, true);
+            fixture.injectCompliance(null);
+            assertThrows(IllegalStateException.class, () -> fixture.audit());
         }
     }
+
+    //test injectClient()
+    @Test
+    public void unsetClient() {
+        Project myProjectMock = mock(Project.class);
+        when(myProjectMock.getId()).thenReturn(1, 1, 2, 2, 1, 1, 2, 2);
+        when(myProjectMock.getName()).thenReturn("Project A", "Project B", "Project A", "Project B");
+        ClientReporting myClientMock = mock(ClientReporting.class);
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+        fixture.injectClient(myClientMock);
+
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+            //when
+            fixture.addProject("Project A", "Mr Shelby", 30, 50);
+            fixture.addProject("Project B", "Mr Client", 40, 50);
+
+            fixture.addTask(fixture.findProjectID("Project A", "Mr Shelby"), "New task for project A", 50, false);
+            fixture.addTask(fixture.findProjectID("Project B", "Mr Client"), "New task for project B", 50, false);
+
+            fixture.finaliseProject(fixture.findProjectID("Project A", "Mr Shelby"));
+            verify(myClientMock, times(1)).sendReport(eq("Mr Shelby"), anyString(), any());
+            assertEquals(1, fixture.getAllProjects().size());
+
+            fixture.injectClient(null);
+
+            assertThrows(IllegalStateException.class, () -> fixture.finaliseProject(fixture.findProjectID("Project B", "Mr Client")));
+            assertEquals(1, fixture.getAllProjects().size());
+        }
+    }
+
+    //test login()
+    @Test
+    public void loginUsrNull() {
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        assertThrows(IllegalArgumentException.class, () -> fixture.login(null, "password"));
+    }
+
+    @Test
+    public void loginPassNull() {
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        assertThrows(IllegalArgumentException.class, () -> fixture.login("user", null));
+    }
+
+    @Test
+    public void loginInvalidCreds() {
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        boolean b = fixture.login("abur2581", "notmyrealpassword:)");
+        assertFalse(b);
+    }
+
+    //test logout()
+    @Test
+    public void logoutAdd() {
+        //given
+        Project myProjectMock = mock(Project.class);
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+
+
+        //when
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+            // You need to place your code that uses makeProject (i.e. BSFacade.addProject) in this try-with-resources block
+            Project p = fixture.addProject("A renovation", "Mr. X", 1, 50);
+
+            //then
+            assertThat(p, equalTo(myProjectMock));
+            assertEquals(1, fixture.getAllProjects().size());
+
+            fixture.logout();
+
+            assertThrows(IllegalStateException.class, () -> fixture.addProject("A renovation part 2", "Mr. Y", 1, 50));
+        }
+    }
+
+    @Test
+    public void logoutNoAuthInjections() {
+        ERPCheatFactory hax = new ERPCheatFactory();
+        assertThrows(IllegalStateException.class, () -> fixture.logout());
+    }
+
+    @Test
+    public void logoutNoLogin() {
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        assertThrows(IllegalStateException.class , () -> fixture.logout());
+    }
+
 }
