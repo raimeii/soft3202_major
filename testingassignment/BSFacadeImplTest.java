@@ -972,8 +972,8 @@ public class BSFacadeImplTest {
     @Test
     public void auditNoneCompliant() {
         Project myProjectMock = mock(Project.class);
-        when(myProjectMock.getId()).thenReturn(1, 1, 2, 2, 1, 1, 2, 2);
-        when(myProjectMock.getName()).thenReturn("Project A", "Project C", "Project A", "Project C");
+        when(myProjectMock.getId()).thenReturn(1, 1, 1, 1, 2);
+        when(myProjectMock.getName()).thenReturn("Project A", "Project A", "Project A", "Project A", "Project C");
         ComplianceReporting myComplianceMock = mock(ComplianceReporting.class);
 
         ERPCheatFactory hax = new ERPCheatFactory();
@@ -987,12 +987,11 @@ public class BSFacadeImplTest {
 
 
             fixture.addProject("Project A", "Mr Shelby", 30, 50);
-            fixture.addProject("Project C", "Mr Thorne", 25, 50);
-
             fixture.setProjectCeiling(fixture.findProjectID("Project A", "Mr Shelby"), 20);
-            fixture.setProjectCeiling(fixture.findProjectID("Project C", "Mr Thorne"), 20);
-
             fixture.addTask(fixture.findProjectID("Project A", "Mr Shelby"), "Project A task", 50, true);
+
+            fixture.addProject("Project C", "Mr Thorne", 25, 50);
+            fixture.setProjectCeiling(fixture.findProjectID("Project C", "Mr Thorne"), 20);
             fixture.addTask(fixture.findProjectID("Project C", "Mr Thorne"), "Project C task", 70, true);
 
             fixture.audit();
@@ -1004,8 +1003,8 @@ public class BSFacadeImplTest {
     @Test
     public void auditMixedCompliance() {
         Project myProjectMock = mock(Project.class);
-        when(myProjectMock.getId()).thenReturn(1, 1, 2, 2, 1, 1, 2, 2);
-        when(myProjectMock.getName()).thenReturn("Project A", "Project C", "Project A", "Project C");
+        when(myProjectMock.getId()).thenReturn(1, 1, 1, 1, 2);
+        when(myProjectMock.getName()).thenReturn("Project A", "Project A", "Project A", "Project A", "Project C");
         ComplianceReporting myComplianceMock = mock(ComplianceReporting.class);
 
         ERPCheatFactory hax = new ERPCheatFactory();
@@ -1019,16 +1018,14 @@ public class BSFacadeImplTest {
 
 
             fixture.addProject("Project A", "Mr Shelby", 30, 50);
-            fixture.addProject("Project C", "Mr Thorne", 25, 50);
-
-            //when, project 1 and 2 in order, first round of A, C project name calls
             fixture.setProjectCeiling(fixture.findProjectID("Project A", "Mr Shelby"), 20);
-            fixture.setProjectCeiling(fixture.findProjectID("Project C", "Mr Thorne"), 20);
-
-            //second round of 1, 2 pid calls, second round of A, C project name calls
             fixture.addTask(fixture.findProjectID("Project A", "Mr Shelby"), "Project A task", 50, true);
+
+            fixture.addProject("Project C", "Mr Thorne", 25, 50);
+            fixture.setProjectCeiling(fixture.findProjectID("Project C", "Mr Thorne"), 20);
             fixture.addTask(fixture.findProjectID("Project C", "Mr Thorne"), "Project C task", 15, true);
 
+            //getName will return project C
             fixture.audit();
 
             verify(myComplianceMock, times(1)).sendReport(anyString(), anyInt(), any());
@@ -1139,7 +1136,7 @@ public class BSFacadeImplTest {
             fixture.finaliseProject(1);
 
             verify(myClientMock, times(1)).sendReport(eq("Mr Shelby"), anyString(), any());
-            verify(myComplianceMock, times(1)).sendReport(eq("Mr Shelby"), anyInt(), any());
+            verify(myComplianceMock, times(1)).sendReport(eq("Project A"), anyInt(), any());
             assertEquals(0, fixture.getAllProjects().size());
         }
     }
@@ -1226,8 +1223,8 @@ public class BSFacadeImplTest {
     @Test
     public void unsetClient() {
         Project myProjectMock = mock(Project.class);
-        when(myProjectMock.getId()).thenReturn(1, 1, 2, 2, 1, 1, 2, 2);
-        when(myProjectMock.getName()).thenReturn("Project A", "Project B", "Project A", "Project B");
+        when(myProjectMock.getId()).thenReturn(1, 1, 1, 1, 2);
+        when(myProjectMock.getName()).thenReturn("Project A", "Project A", "Project A", "Project A", "Project B");
         ClientReporting myClientMock = mock(ClientReporting.class);
         ERPCheatFactory hax = new ERPCheatFactory();
         fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
@@ -1239,12 +1236,12 @@ public class BSFacadeImplTest {
                     .thenReturn(myProjectMock);
             //when
             fixture.addProject("Project A", "Mr Shelby", 30, 50);
-            fixture.addProject("Project B", "Mr Client", 40, 50);
-
             fixture.addTask(fixture.findProjectID("Project A", "Mr Shelby"), "New task for project A", 50, false);
+            fixture.finaliseProject(fixture.findProjectID("Project A", "Mr Shelby"));
+
+            fixture.addProject("Project B", "Mr Client", 40, 50);
             fixture.addTask(fixture.findProjectID("Project B", "Mr Client"), "New task for project B", 50, false);
 
-            fixture.finaliseProject(fixture.findProjectID("Project A", "Mr Shelby"));
             verify(myClientMock, times(1)).sendReport(eq("Mr Shelby"), anyString(), any());
             assertEquals(1, fixture.getAllProjects().size());
 
