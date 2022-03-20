@@ -1,6 +1,9 @@
 //package au.edu.sydney.soft3202.reynholm.erp.billingsystem;
 //import au.edu.sydney.soft3202.reynholm.erp.project.Project;
 //import au.edu.sydney.soft3202.reynholm.erp.cheatmodule.ERPCheatFactory;
+//import au.edu.sydney.soft3202.reynholm.erp.compliance.ComplianceReporting;
+
+import compliance.ComplianceReporting;
 import project.Project;
 import billingsystem.BSFacadeImpl;
 import cheatmodule.ERPCheatFactory;
@@ -103,7 +106,7 @@ public class BSFacadeImplTest {
         ERPCheatFactory hax = new ERPCheatFactory();
         fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
         fixture.login("user", "password");
-        assertThrows(IllegalArgumentException.class, () -> fixture.addProject("some name", "some client", 0.1, 40));
+        assertThrows(IllegalArgumentException.class, () -> fixture.addProject("some name", "some client", 0.01, 40));
     }
 
     @Test
@@ -164,7 +167,7 @@ public class BSFacadeImplTest {
     }
 
     @Test
-    public void overRateExactly10Percent() {
+    public void overRateOver10Percent() {
         Project myProjectMock = mock(Project.class);
         ERPCheatFactory hax = new ERPCheatFactory();
         fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
@@ -177,7 +180,7 @@ public class BSFacadeImplTest {
             mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
                     .thenReturn(myProjectMock);
 
-            Project p = fixture.addProject("A renovation", "Mr. X", 50, 55);
+            Project p = fixture.addProject("A renovation", "Mr. X", 50, 56);
 
             //then
             assertThat(p, equalTo(myProjectMock));
@@ -213,7 +216,7 @@ public class BSFacadeImplTest {
     public void allInvalidParamsAndState() {
         ERPCheatFactory hax = new ERPCheatFactory();
         fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
-        assertThrows(IllegalStateException.class, () -> fixture.addProject("", null, 0.1, 100.01));
+        assertThrows(IllegalArgumentException.class, () -> fixture.addProject("", null, 0.1, 100.01));
     }
 
     @Test
@@ -370,6 +373,23 @@ public class BSFacadeImplTest {
     }
 
     @Test
+    public void taskHoursOver100() {
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+        assertThrows(IllegalArgumentException.class, () -> fixture.addTask(639, "", 150, false));
+    }
+
+    @Test
+    public void taskHoursNegative() {
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+        assertThrows(IllegalArgumentException.class, () -> fixture.addTask(639, "", -10, false));
+    }
+
+
+    @Test
     public void addTaskNoProjectMatch() {
         //given
         Project myProjectMock = mock(Project.class);
@@ -428,11 +448,13 @@ public class BSFacadeImplTest {
 
             //go over default 100 ceiling, but give force
             Project p = fixture.addProject("A renovation", "Mr. X", 1, 50);
-            boolean b = fixture.addTask(20, "Some new unreasonable task", 200, true);
+            boolean b = fixture.addTask(20, "Some new unreasonable task", 100, true);
+            boolean c = fixture.addTask(20, "Another new unreasonable task", 100, true);
 
             //then
             assertThat(p, equalTo(myProjectMock));
             assertTrue(b);
+            assertTrue(c);
         }
     }
 
@@ -451,11 +473,13 @@ public class BSFacadeImplTest {
 
             //go over default 100 ceiling, but give force
             Project p = fixture.addProject("A renovation", "Mr. Y", 1, 50);
-            boolean b = fixture.addTask(20, "Another unreasonable new task", 200, false);
+            boolean b = fixture.addTask(20, "An unreasonable new task", 90, false);
+            boolean c = fixture.addTask(20, "yet another unreasonable new task", 100, false);
 
             //then
             assertThat(p, equalTo(myProjectMock));
-            assertFalse(b);
+            assertTrue(b);
+            assertFalse(c);
         }
     }
 
@@ -583,11 +607,29 @@ public class BSFacadeImplTest {
 
             Project p = fixture.addProject("A renovation", "Mr. Y", 1, 50);
             fixture.setProjectCeiling(20, 1000);
-            boolean b = fixture.addTask(20, "An absurdly long task", 999, false);
+            boolean b = fixture.addTask(20, "An absurdly long task 1", 100, false);
+            boolean c = fixture.addTask(20, "An absurdly long task 2", 100, false);
+            boolean d = fixture.addTask(20, "An absurdly long task 3", 100, false);
+            boolean e = fixture.addTask(20, "An absurdly long task 4", 100, false);
+            boolean f = fixture.addTask(20, "An absurdly long task 5", 100, false);
+            boolean g = fixture.addTask(20, "An absurdly long task 6", 100, false);
+            boolean h = fixture.addTask(20, "An absurdly long task 7", 100, false);
+            boolean i = fixture.addTask(20, "An absurdly long task 8", 100, false);
+            boolean j = fixture.addTask(20, "An absurdly long task 9", 100, false);
+            boolean k = fixture.addTask(20, "An absurdly long task 10", 100, false);
 
             //then
             assertThat(p, equalTo(myProjectMock));
             assertTrue(b);
+            assertTrue(c);
+            assertTrue(d);
+            assertTrue(e);
+            assertTrue(f);
+            assertTrue(g);
+            assertTrue(h);
+            assertTrue(i);
+            assertTrue(j);
+            assertTrue(k);
         }
     }
 
@@ -636,6 +678,7 @@ public class BSFacadeImplTest {
         //given
         Project myProjectMock = mock(Project.class);
         when(myProjectMock.getId()).thenReturn(69);
+        when(myProjectMock.getName()).thenReturn("Project X");
 
         ERPCheatFactory hax = new ERPCheatFactory();
         fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
@@ -645,7 +688,7 @@ public class BSFacadeImplTest {
             mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
                     .thenReturn(myProjectMock);
 
-            fixture.addProject("Project A", "Rai Mei", 1, 50);
+            fixture.addProject("Project X", "Rai Mei", 1, 50);
 
             //then
             assertThrows(IllegalStateException.class, () -> fixture.findProjectID("Project B", "Rai Mei"));
@@ -657,6 +700,7 @@ public class BSFacadeImplTest {
         //given
         Project myProjectMock = mock(Project.class);
         when(myProjectMock.getId()).thenReturn(69);
+        when(myProjectMock.getName()).thenReturn("Project A");
 
         ERPCheatFactory hax = new ERPCheatFactory();
         fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
@@ -678,6 +722,7 @@ public class BSFacadeImplTest {
         //given
         Project myProjectMock = mock(Project.class);
         when(myProjectMock.getId()).thenReturn(69);
+        when(myProjectMock.getName()).thenReturn("Project X");
 
         ERPCheatFactory hax = new ERPCheatFactory();
         fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
@@ -699,6 +744,7 @@ public class BSFacadeImplTest {
         //given
         Project myProjectMock = mock(Project.class);
         when(myProjectMock.getId()).thenReturn(69);
+        when(myProjectMock.getName()).thenReturn("Project A");
 
         ERPCheatFactory hax = new ERPCheatFactory();
         fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
@@ -754,6 +800,7 @@ public class BSFacadeImplTest {
         //given
         Project myProjectMock = mock(Project.class);
         when(myProjectMock.getId()).thenReturn(20);
+        when(myProjectMock.getName()).thenReturn("Project A");
 
         ERPCheatFactory hax = new ERPCheatFactory();
         fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
@@ -862,6 +909,63 @@ public class BSFacadeImplTest {
             for (Project project : projectList) {
                 assertThat(project, equalTo(myProjectMock));
             }
+        }
+    }
+
+    //test audit()
+    @Test
+    public void auditNoInjections() {
+        assertThrows(IllegalStateException.class, () -> fixture.audit());
+    }
+
+    @Test
+    public void auditNoLogin() {
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        assertThrows(IllegalStateException.class, () -> fixture.audit());
+    }
+
+    @Test
+    public void auditNoCompliance() {
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.login("user", "password");
+        assertThrows(IllegalStateException.class, () -> fixture.audit());
+    }
+
+    @Test
+    public void auditAllCompliant() {
+        Project myProjectMock = mock(Project.class);
+        when(myProjectMock.getId()).thenReturn(1, 2, 3);
+        when(myProjectMock.getName()).thenReturn("Project A", "Project B", "Project C");
+        ComplianceReporting myComplianceMock = mock(ComplianceReporting.class);
+
+        ERPCheatFactory hax = new ERPCheatFactory();
+        fixture.injectAuth(hax.getAuthenticationModule(), hax.getAuthorisationModule());
+        fixture.injectCompliance(myComplianceMock);
+        fixture.login("user", "password");
+
+        try (MockedStatic<Project> mock = mockStatic(Project.class)) {
+            mock.when(() -> Project.makeProject(anyInt(), anyString(), anyDouble(), anyDouble()))
+                    .thenReturn(myProjectMock);
+
+            //when
+            fixture.addProject("Project A", "Mr Shelby", 30, 50);
+            fixture.addProject("Project B", "Mr Shelby", 30, 50);
+            fixture.addProject("Project C", "Mr Thorne", 25, 50);
+
+            int p1 = fixture.findProjectID("Project A", "Mr Shelby");
+            int p2 = fixture.findProjectID("Project B", "Mr Shelby");
+            int p3 = fixture.findProjectID("Project C", "Mr Thorne");
+
+            fixture.addTask(p1, "Project A task", 50, false);
+            fixture.addTask(p2, "Project B task", 60, false);
+            fixture.addTask(p3, "Project C task", 70, false);
+
+            fixture.audit();
+
+            verify(myComplianceMock, never()).sendReport(anyString(), anyInt(), any());
+
         }
     }
 }
