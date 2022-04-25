@@ -182,7 +182,7 @@ public class GameWindow {
         if (saveNameInput.isPresent()) {
             String saveName = saveNameInput.get();
             try {
-                if (Database.queryCheckExists(saveName)) {
+                if (Database.queryCheckExists(saveName, currentUser)) {
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                     alert.setTitle("Overwrite save?");
                     alert.setHeaderText("A save file with this name already exists. Would you like to overwrite it?");
@@ -225,7 +225,7 @@ public class GameWindow {
         Optional<String> input = choiceInput.showAndWait();
         if (input.isPresent()) {
             String saveName = input.get();
-            String serialisation = Database.querySerialisation(saveName);
+            String serialisation = Database.querySerialisation(saveName, model.getCurrentUser());
             try {
                 model.deserialise(serialisation);
             } catch (IllegalArgumentException e) {

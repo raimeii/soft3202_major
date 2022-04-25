@@ -125,17 +125,19 @@ public class Database {
 
     //returns the serialisation of the savefile with given name
     //called when user selects a file to load, feeds string to modified deserialise
-    public static String querySerialisation(String saveName) {
+    public static String querySerialisation(String saveName, String userOwner) {
         String allSavesQuery =
                 """
                 SELECT serialisation
                 FROM users AS u
                 INNER JOIN saves AS s ON u.username = s.user_owner
                 WHERE s.save_name = ?
+                AND s.user_owner = ?
                 """;
         try (Connection connection = DriverManager.getConnection(gameDBURL);
              PreparedStatement preparedStatement = connection.prepareStatement(allSavesQuery)) {
             preparedStatement.setString(1, saveName);
+            preparedStatement.setString(2, userOwner);
             return preparedStatement.executeQuery().getString("serialisation");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -144,16 +146,19 @@ public class Database {
         return null;
     }
 
-    public static boolean queryCheckExists(String saveName) {
+    //determines if there is a save with a given name in the saves table
+    public static boolean queryCheckExists(String saveName, String userOwner) {
         String determineExistsQuery =
                 """
                 SELECT save_name
                 FROM saves
                 WHERE save_name = ?
+                AND user_owner = ?
                 """;
         try (Connection connection = DriverManager.getConnection(gameDBURL);
              PreparedStatement preparedStatement = connection.prepareStatement(determineExistsQuery)) {
             preparedStatement.setString(1, saveName);
+            preparedStatement.setString(2, userOwner);
             ResultSet result = preparedStatement.executeQuery();
             return result.next();
         } catch (SQLException e) {
@@ -163,6 +168,7 @@ public class Database {
         return false;
     }
 
+    //updates an existing save with a new serialisation string
     public static void updateSave(String saveName, String serialisation) {
         String updateSaveQuery = """
                 UPDATE saves
