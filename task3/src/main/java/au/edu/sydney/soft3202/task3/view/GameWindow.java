@@ -1,5 +1,6 @@
 package au.edu.sydney.soft3202.task3.view;
 
+import au.edu.sydney.soft3202.task3.model.Database;
 import au.edu.sydney.soft3202.task3.model.GameBoard;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -134,11 +135,29 @@ public class GameWindow {
         }
 
         String serialisation = model.serialise();
+        String currentUser = model.getCurrentUser();
 
-        TextInputDialog textInput = new TextInputDialog(serialisation);
-        textInput.setTitle("Serialisation");
-        textInput.setHeaderText("Your serialisation string is:");
-        textInput.showAndWait();
+        TextInputDialog textInput = new TextInputDialog();
+        textInput.setTitle("Save Game");
+        textInput.setHeaderText("What would you like to call your save?: ");
+        Optional<String> saveNameInput = textInput.showAndWait();
+
+        if (saveNameInput.isPresent()) {
+            String saveName = saveNameInput.get();
+            try {
+                Database.addSaveFile(currentUser, saveName, serialisation);
+            } catch (IllegalArgumentException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Serialisation Error");
+                alert.setHeaderText(e.getMessage());
+
+                alert.showAndWait();
+                return;
+            }
+        }
+
+
+
     }
 
     private void deserialiseAction() {

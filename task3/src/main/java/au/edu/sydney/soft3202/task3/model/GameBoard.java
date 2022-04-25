@@ -15,6 +15,8 @@ public class GameBoard {
     private Player currentTurn = null;
     private boolean continuing = false;
 
+    private String user = "test";
+
     // This is not the View leaking in to the Model. It is a way for the View to get inside the Model, but the Model
     // doesn't know or care what sort of observer it is, just that it can be notified. This is likely the best way for
     // the View to find out if the Model has changed
@@ -23,9 +25,21 @@ public class GameBoard {
     public GameBoard() {
         tiles = new TileState[WIDTH][HEIGHT];
         observers = new HashSet<>();
+        Database.createDB();
+        Database.setupDB();
 
         initialise();
 
+    }
+
+    //new - simple setter for user
+    public void setCurrentUser(String user) {
+        this.user = user;
+    }
+
+    //new - simple getter for user
+    public String getCurrentUser() {
+        return this.user;
     }
 
     private void initialise() {
@@ -243,7 +257,7 @@ public class GameBoard {
         for (int x = 0; x < tiles.length; x++) {
             for (int y = 0; y < tiles[0].length; y++) {
                 if (player == getOwner(tiles[x][y]))
-                results.addAll(canTake(new Point(x, y)));
+                    results.addAll(canTake(new Point(x, y)));
             }
         }
 
