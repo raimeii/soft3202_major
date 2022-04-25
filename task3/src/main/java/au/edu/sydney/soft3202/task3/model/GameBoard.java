@@ -15,7 +15,7 @@ public class GameBoard {
     private Player currentTurn = null;
     private boolean continuing = false;
 
-    private String user = "test";
+    private String user = null;
 
     // This is not the View leaking in to the Model. It is a way for the View to get inside the Model, but the Model
     // doesn't know or care what sort of observer it is, just that it can be notified. This is likely the best way for
@@ -27,9 +27,6 @@ public class GameBoard {
         observers = new HashSet<>();
         Database.createDB();
         Database.setupDB();
-        //For testing
-        Database.addUser("test");
-
         initialise();
 
     }
@@ -42,6 +39,10 @@ public class GameBoard {
     //new - simple getter for user
     public String getCurrentUser() {
         return this.user;
+    }
+
+    public boolean validateUserNotNull() {
+        return this.user != null;
     }
 
     private void initialise() {

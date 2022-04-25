@@ -144,4 +144,40 @@ public class Database {
         return null;
     }
 
+    public static boolean queryCheckExists(String saveName) {
+        String determineExistsQuery =
+                """
+                SELECT save_name
+                FROM saves
+                WHERE save_name = ?
+                """;
+        try (Connection connection = DriverManager.getConnection(gameDBURL);
+             PreparedStatement preparedStatement = connection.prepareStatement(determineExistsQuery)) {
+            preparedStatement.setString(1, saveName);
+            ResultSet result = preparedStatement.executeQuery();
+            return result.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        return false;
+    }
+
+    public static void updateSave(String saveName, String serialisation) {
+        String updateSaveQuery = """
+                UPDATE saves
+                SET serialisation = ?
+                WHERE save_name = ?
+                """;
+        try (Connection connection = DriverManager.getConnection(gameDBURL);
+             PreparedStatement preparedStatement = connection.prepareStatement(updateSaveQuery)) {
+            preparedStatement.setString(1, serialisation);
+            preparedStatement.setString(2, saveName);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
+
 }

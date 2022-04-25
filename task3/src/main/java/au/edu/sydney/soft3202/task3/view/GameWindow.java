@@ -2,15 +2,12 @@ package au.edu.sydney.soft3202.task3.view;
 
 import au.edu.sydney.soft3202.task3.model.Database;
 import au.edu.sydney.soft3202.task3.model.GameBoard;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -51,7 +48,42 @@ public class GameWindow {
         pane.setRight(sideButtonBar);
         pane.setBottom(statusBar.getStatusBar());
 
+        //prompt login
+        promptLogin();
+
+
     }
+
+    //new - prompt login
+    private void promptLogin() {
+        TextInputDialog textInput = new TextInputDialog("");
+        textInput.setTitle("Login");
+        textInput.setHeaderText("Please enter your username: ");
+
+        Optional<String> input = textInput.showAndWait();
+
+        if (input.isPresent()) {
+            String userName = input.get();
+            try {
+                model.setCurrentUser(userName);
+                Database.addUser(userName);
+            } catch (IllegalArgumentException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Login Error");
+                alert.setHeaderText(e.getMessage());
+
+                alert.showAndWait();
+                return;
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Login Warning");
+            alert.setHeaderText("Please enter a username before proceeding.");
+            alert.showAndWait();
+            promptLogin();
+        }
+    }
+
 
     private void buildKeyListeners() {
         // This allows keyboard input. Note that the scene is used, so any time
@@ -77,10 +109,10 @@ public class GameWindow {
         Button newGameBtn = new Button("New Game");
         newGameBtn.setOnAction((event) -> newGameAction());
 
-        Button serialiseBtn = new Button("Serialise");
+        Button serialiseBtn = new Button("Save Game");
         serialiseBtn.setOnAction((event) -> serialiseAction());
 
-        Button deserialiseBtn = new Button("Deserialise");
+        Button deserialiseBtn = new Button("Load Game");
         deserialiseBtn.setOnAction((event) -> deserialiseAction());
 
         this.sideButtonBar = new VBox(newGameBtn, serialiseBtn, deserialiseBtn);
@@ -93,10 +125,10 @@ public class GameWindow {
         MenuItem newGameItm = new MenuItem("New Game");
         newGameItm.setOnAction((event)-> newGameAction());
 
-        MenuItem serialiseItm = new MenuItem("Serialise");
+        MenuItem serialiseItm = new MenuItem("Save Game");
         serialiseItm.setOnAction((event)-> serialiseAction());
 
-        MenuItem deserialiseItm = new MenuItem("Deserialise");
+        MenuItem deserialiseItm = new MenuItem("Load Game");
         deserialiseItm.setOnAction((event)-> deserialiseAction());
 
         actionMenu.getItems().addAll(newGameItm, serialiseItm, deserialiseItm);
@@ -150,7 +182,19 @@ public class GameWindow {
         if (saveNameInput.isPresent()) {
             String saveName = saveNameInput.get();
             try {
-                Database.addSaveFile(currentUser, saveName, serialisation);
+                if (Database.queryCheckExists(saveName)) {
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Overwrite save?");
+                    alert.setHeaderText("A save file with this name already exists. Would you like to overwrite it?");
+
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.isPresent() && result.get() == ButtonType.OK) {
+                        Database.updateSave(saveName, serialisation);
+                    }
+                } else {
+                    Database.addSaveFile(currentUser, saveName, serialisation);
+                }
+
             } catch (IllegalArgumentException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Serialisation Error");
@@ -160,8 +204,6 @@ public class GameWindow {
                 return;
             }
         }
-
-
 
     }
 
@@ -173,31 +215,30 @@ public class GameWindow {
             - display all saves of current user using Database.queryUserSaves (observable list of strings)
             - on click, call model.deserialise() using the string you've selected
         */
+        ArrayList<String> saveList = Database.queryUserSaves(model.getCurrentUser());
+        ChoiceDialog<String> choiceInput = new ChoiceDialog<>("");
 
-        ObservableList<String> saves = FXCollections.observableArrayList(Database.queryUserSaves(model.getCurrentUser()));
-        ListView<String> listView = new ListView<String>(saves);
+        choiceInput.setTitle("Load game");
+        choiceInput.setHeaderText("Save files for user: " + model.getCurrentUser());
+        choiceInput.getItems().addAll(saveList);
 
-        listView.setMaxSize(200, 160);
+        Optional<String> input = choiceInput.showAndWait();
+        if (input.isPresent()) {
+            String saveName = input.get();
+            String serialisation = Database.querySerialisation(saveName);
+            try {
+                model.deserialise(serialisation);
+            } catch (IllegalArgumentException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Serialisation Error");
+                alert.setHeaderText(e.getMessage());
 
-        Stage newStage = new Stage();
-        newStage.setWidth(250);
-        newStage.setHeight(250);
-        newStage.setTitle("User " + model.getCurrentUser() +" save files");
+                alert.showAndWait();
+                return;
+            }
 
-        Button buttonTest = new Button("Load");
-        buttonTest.setOnAction(event -> {
-            String serialisation = Database.querySerialisation(listView.getSelectionModel().getSelectedItem());
-            model.deserialise(serialisation);
             boardPane.updateBoard();
-            Stage toClose = (Stage) buttonTest.getScene().getWindow();
-            toClose.close();
-        });
-
-        VBox layout = new VBox(10);
-        layout.getChildren().addAll(listView, buttonTest);
-        newStage.setScene(new Scene(layout));
-        newStage.show();
-
+        }
     }
 
     private void doNewGame() {
