@@ -33,8 +33,7 @@ public class Database {
         String createUsersTableSQL =
                 """
                 CREATE TABLE IF NOT EXISTS users (
-                    user_id integer PRIMARY_KEY,
-                    username text NOT NULL
+                    username text PRIMARY KEY
                 );
                 """;
 
@@ -76,6 +75,25 @@ public class Database {
             e.printStackTrace();
             System.exit(-1);
         }
+    }
+
+    public static boolean queryUserExists(String username) {
+        String determineExistsQuery =
+                """
+                SELECT username
+                FROM saves
+                AND username = ?
+                """;
+        try (Connection connection = DriverManager.getConnection(gameDBURL);
+             PreparedStatement preparedStatement = connection.prepareStatement(determineExistsQuery)) {
+            preparedStatement.setString(1, username);
+            ResultSet result = preparedStatement.executeQuery();
+            return result.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        return false;
     }
 
     //add a save file to the save table with the requisite details, called when save button is initialised

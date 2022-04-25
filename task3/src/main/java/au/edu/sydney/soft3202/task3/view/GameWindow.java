@@ -65,17 +65,19 @@ public class GameWindow {
         if (input.isPresent()) {
             String userName = input.get();
             try {
+                if (!Database.queryUserExists(userName)) {
+                    Database.addUser(userName);
+                }
                 model.setCurrentUser(userName);
-                Database.addUser(userName);
             } catch (IllegalArgumentException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Login Error");
                 alert.setHeaderText(e.getMessage());
 
                 alert.showAndWait();
-                return;
             }
         } else {
+            //throw a warning if x/cancel is pressed when the input is empty, pressing ok will make/use a user with an blank name
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Login Warning");
             alert.setHeaderText("Please enter a username before proceeding.");
@@ -201,7 +203,6 @@ public class GameWindow {
                 alert.setHeaderText(e.getMessage());
 
                 alert.showAndWait();
-                return;
             }
         }
 
@@ -212,7 +213,7 @@ public class GameWindow {
         // We don't do any validation here, as that would leak model knowledge into the view.
 
         /*needs complete overhaul:
-            - display all saves of current user using Database.queryUserSaves (observable list of strings)
+            - display all saves of current user using Database.queryUserSaves (ArrayList of strings)
             - on click, call model.deserialise() using the string you've selected
         */
         ArrayList<String> saveList = Database.queryUserSaves(model.getCurrentUser());
