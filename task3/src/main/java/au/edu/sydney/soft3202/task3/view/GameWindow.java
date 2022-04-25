@@ -2,12 +2,17 @@ package au.edu.sydney.soft3202.task3.view;
 
 import au.edu.sydney.soft3202.task3.model.Database;
 import au.edu.sydney.soft3202.task3.model.GameBoard;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import java.util.ArrayList;
 import java.util.Optional;
 
 /**
@@ -164,27 +169,35 @@ public class GameWindow {
         // Here we take an existing serialisation string and feed it back into the model to retrieve that state.
         // We don't do any validation here, as that would leak model knowledge into the view.
 
-        TextInputDialog textInput = new TextInputDialog("");
-        textInput.setTitle("Serialisation");
-        textInput.setHeaderText("Enter your serialisation string:");
+        /*needs complete overhaul:
+            - display all saves of current user using Database.queryUserSaves (observable list of strings)
+            - on click, call model.deserialise() using the string you've selected
+        */
 
-        Optional<String> input = textInput.showAndWait();
-        if (input.isPresent()) {
-            String serialisation = input.get();
+        ObservableList<String> saves = FXCollections.observableArrayList(Database.queryUserSaves(model.getCurrentUser()));
+        ListView<String> listView = new ListView<String>(saves);
 
-            try {
-                model.deserialise(serialisation);
-            } catch (IllegalArgumentException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Serialisation Error");
-                alert.setHeaderText(e.getMessage());
+        listView.setMaxSize(200, 160);
 
-                alert.showAndWait();
-                return;
-            }
+        Stage newStage = new Stage();
+        newStage.setWidth(250);
+        newStage.setHeight(250);
+        newStage.setTitle("User " + model.getCurrentUser() +" save files");
 
+        Button buttonTest = new Button("Load");
+        buttonTest.setOnAction(event -> {
+            String serialisation = Database.querySerialisation(listView.getSelectionModel().getSelectedItem());
+            model.deserialise(serialisation);
             boardPane.updateBoard();
-        }
+            Stage toClose = (Stage) buttonTest.getScene().getWindow();
+            toClose.close();
+        });
+
+        VBox layout = new VBox(10);
+        layout.getChildren().addAll(listView, buttonTest);
+        newStage.setScene(new Scene(layout));
+        newStage.show();
+
     }
 
     private void doNewGame() {

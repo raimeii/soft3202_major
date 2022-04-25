@@ -3,6 +3,7 @@ package au.edu.sydney.soft3202.task3.model;
 import javax.xml.transform.Result;
 import java.io.File;
 import java.sql.*;
+import java.util.ArrayList;
 
 
 public class Database {
@@ -32,7 +33,7 @@ public class Database {
         String createUsersTableSQL =
                 """
                 CREATE TABLE IF NOT EXISTS users (
-                    user_id integer PRIMARY KEY,
+                    user_id integer PRIMARY_KEY,
                     username text NOT NULL
                 );
                 """;
@@ -98,23 +99,28 @@ public class Database {
     }
 
     //returns a resultSet (might change to string array) of all saves of the given user
-    public static ResultSet queryUserSaves(String username) {
+    public static ArrayList<String> queryUserSaves(String username) {
+        ArrayList<String> ret = new ArrayList<>();
         String allSavesQuery =
                 """
-                SELECT s.save_name
+                SELECT save_name
                 FROM users AS u
                 INNER JOIN saves AS s ON u.username = s.user_owner
-                WHERE u.username = ?
+                WHERE s.user_owner = ?
                 """;
         try (Connection connection = DriverManager.getConnection(gameDBURL);
              PreparedStatement preparedStatement = connection.prepareStatement(allSavesQuery)) {
             preparedStatement.setString(1, username);
-            return preparedStatement.executeQuery();
+            ResultSet result = preparedStatement.executeQuery();
+            while (result.next()) {
+                ret.add(result.getString("save_name"));
+            }
+            return ret;
         } catch (SQLException e) {
             e.printStackTrace();
             System.exit(-1);
         }
-        return null;
+        return ret;
     }
 
     //returns the serialisation of the savefile with given name
@@ -122,7 +128,7 @@ public class Database {
     public static String querySerialisation(String saveName) {
         String allSavesQuery =
                 """
-                SELECT s.serialisation
+                SELECT serialisation
                 FROM users AS u
                 INNER JOIN saves AS s ON u.username = s.user_owner
                 WHERE s.save_name = ?

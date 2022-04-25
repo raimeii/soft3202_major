@@ -27,6 +27,8 @@ public class GameBoard {
         observers = new HashSet<>();
         Database.createDB();
         Database.setupDB();
+        //For testing
+        Database.addUser("test");
 
         initialise();
 
