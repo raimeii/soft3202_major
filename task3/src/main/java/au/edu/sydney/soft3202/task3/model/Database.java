@@ -81,8 +81,8 @@ public class Database {
         String determineExistsQuery =
                 """
                 SELECT username
-                FROM saves
-                AND username = ?
+                FROM users
+                WHERE username = ?
                 """;
         try (Connection connection = DriverManager.getConnection(gameDBURL);
              PreparedStatement preparedStatement = connection.prepareStatement(determineExistsQuery)) {

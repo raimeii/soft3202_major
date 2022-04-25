@@ -166,8 +166,8 @@ public class GameWindow {
 
         if (null == model.getCurrentTurn()) { // no current game
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Serialisation Error");
-            alert.setHeaderText("There is no game to serialise!");
+            alert.setTitle("Save Game Error");
+            alert.setHeaderText("There is no game to save!");
 
             alert.showAndWait();
             return;
@@ -231,7 +231,7 @@ public class GameWindow {
                 model.deserialise(serialisation);
             } catch (IllegalArgumentException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Serialisation Error");
+                alert.setTitle("Load Game Error");
                 alert.setHeaderText(e.getMessage());
 
                 alert.showAndWait();
