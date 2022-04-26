@@ -223,6 +223,7 @@ public class GameWindow {
         choiceInput.setHeaderText("Save files for user: " + model.getCurrentUser());
         choiceInput.getItems().addAll(saveList);
 
+        //user's returned input is whichever option is clicked at the moment
         Optional<String> input = choiceInput.showAndWait();
         if (input.isPresent()) {
             String saveName = input.get();
