@@ -3,12 +3,9 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import major_project.model.AppModel;
 import major_project.view.AppWindow;
+import java.util.List;
 
 public class Main extends Application {
-
-    private final AppModel model = new AppModel();
-
-    private final AppWindow view = new AppWindow(model);
 
     public static void main(String[] args) {
         launch(args);
@@ -16,8 +13,18 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        boolean inputOnline;
+        boolean outputOnline;
+        Parameters p = getParameters();
+        List<String> listParams = p.getUnnamed();
+        inputOnline = listParams.get(0).equalsIgnoreCase("online");
+        outputOnline = listParams.get(1).equalsIgnoreCase("online");
+
+        AppModel model = new AppModel(inputOnline, outputOnline);
+        AppWindow view = new AppWindow(model);
+
         primaryStage.setScene(view.getScene());
-        primaryStage.setTitle("REEEEE");
+        primaryStage.setTitle("The Guardian tag filterer");
         primaryStage.show();
     }
 
