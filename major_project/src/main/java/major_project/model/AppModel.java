@@ -7,8 +7,6 @@ import java.util.List;
 public class AppModel {
     private final GuardianHandler guardianHandler = new GuardianHandler();
 
-    private final PastebinHandler pastebinHandler = new PastebinHandler();
-
     private final boolean inputOnline;
 
     private final boolean outputOnline;
@@ -42,7 +40,7 @@ public class AppModel {
         if (inputOnline) {
             return guardianHandler.getResultsWithTag(tag);
         } else {
-            return new ArrayList<>(List.of("testResult1" , "testResult2", "testResult3"));
+            return new ArrayList<>(List.of("testResult1" , "testResult2", "testResult3", "testResult4"));
         }
     }
 

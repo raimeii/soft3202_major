@@ -1,6 +1,7 @@
 plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.10'
+    id 'jacoco'
 }
 
 sourceCompatibility = 1.17
@@ -36,4 +37,5 @@ application {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
