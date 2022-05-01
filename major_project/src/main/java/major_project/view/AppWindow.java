@@ -2,6 +2,7 @@ package major_project.view;
 
 
 import javafx.application.HostServices;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -16,7 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import major_project.model.AppModel;
 
-import java.util.ArrayList;
+import java.util.List;
 
 
 public class AppWindow {
@@ -32,8 +33,11 @@ public class AppWindow {
 
     private final ListView<String> resultOutputField;
 
-    public AppWindow(AppModel model) {
+    private final HostServices hostService;
+
+    public AppWindow(AppModel model, HostServices hostService) {
         this.model = model;
+        this.hostService = hostService;
         BorderPane pane = new BorderPane();
         this.scene = new Scene(pane);
 
@@ -77,18 +81,22 @@ public class AppWindow {
             if (event.isControlDown() && event.getCode() == KeyCode.ENTER) {
                 //question: I can make this into an AppWindow method, so I don't have to repeat it, but is passing the variable "input" considered a breach of separation?
                 String input = inputField.getText();
-                ArrayList<String> tagMatches = model.searchMatchingTags(input);
+                List<String> tagMatches = model.searchMatchingTags(input);
                 tagOutputField.getItems().addAll(tagMatches);
             }
         });
     }
 
+    //note: maybe feedback to user when queried tag returns no hits?
     public Button createLookupButton() {
         Button lookupBtn = new Button("Lookup");
         lookupBtn.setOnAction((event -> {
-            
+            if (model.hasTagResponseStored()) {
+                //clear list for new tag search
+                clearTagQuery();
+            }
             String input = inputField.getText();
-            ArrayList<String> tagMatches = model.searchMatchingTags(input);
+            List<String> tagMatches = model.searchMatchingTags(input);
             tagOutputField.getItems().addAll(tagMatches);
         }));
         return lookupBtn;
@@ -96,7 +104,12 @@ public class AppWindow {
 
     public Button createClearButton() {
         Button clearBtn = new Button("Clear tag");
-        clearBtn.setOnAction((event -> clearQueries()));
+        clearBtn.setOnAction((event -> {
+            clearTagQuery();
+            model.setCurrentTag(null);
+            inputField.clear();
+
+        }));
 
         return clearBtn;
     }
@@ -110,21 +123,21 @@ public class AppWindow {
             String tag = tagOutputField.getSelectionModel().getSelectedItem();
             model.setCurrentTag(tag);
             this.currentTagLabel.setText("Articles with tag: " + model.getCurrentTag());
-            ArrayList<String> resultList = model.getResultsWithTag(tag);
-            resultOutputField.getItems().addAll(resultList);
+            List<String> resultList = model.getResultsWithTag(tag);
+            this.resultOutputField.setItems(FXCollections.observableList(resultList));
         });
         return tagOutputField;
     }
 
     public ListView<String> createResultOutputView() {
         ListView<String> resultOutputField = new ListView<>();
-        resultOutputField.setPrefWidth(250);
+        resultOutputField.setPrefWidth(600);
         resultOutputField.setPrefHeight(250);
         //set current tag to whatever is clicked
         resultOutputField.setOnMouseClicked(event -> {
             String title = resultOutputField.getSelectionModel().getSelectedItem();
             String url = model.getContentURL(title);
-
+            hostService.showDocument(url);
         });
         return resultOutputField;
     }
@@ -137,16 +150,24 @@ public class AppWindow {
     }
 
     private void generateReport() {
+        //possible source of M-V leak, not sure how to best approach
+        //current flow is looking like AppModel -> View -> PastebinHandler
+        //maybe View -> AppModel -> PastebinHandler, then AppModel returns some content to be displayed back to the view
+        String pastebinURL = model.generateOutputReport();
+        if (pastebinURL != null) {
+            hostService.showDocument(pastebinURL);
+        } else {
+            ;
+        }
+
 
     }
 
 
-    private void clearQueries() {
-        model.setCurrentTag(null);
+    private void clearTagQuery() {
         tagOutputField.getItems().clear();
         resultOutputField.getItems().clear();
         currentTagLabel.setText("Articles with tag: ");
-        inputField.clear();
     }
 
 
