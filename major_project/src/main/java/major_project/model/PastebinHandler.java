@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 public class PastebinHandler {
     public static String generateOutputReport(AppModel model) {
         try {
-            String URL = String.format("https://pastebin.com/api/api_post.php?api_dev_key=%s&api_paste_code=test&api_option=paste", System.getenv("OUTPUT_API_KEY"));
+            String URL = String.format("https://pastebin.com/api/api_post.php?api_dev_key=%s&api_paste_code=test&api_option=paste", System.getenv("PASTEBIN_API_KEY"));
             System.out.println(URL);
 
             HttpRequest request = HttpRequest.newBuilder(new URI(URL))

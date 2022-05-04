@@ -41,9 +41,7 @@ public class AppWindow {
         BorderPane pane = new BorderPane();
         this.scene = new Scene(pane);
 
-        this.inputField = new TextField();
-        this.inputField.setPrefWidth(500);
-        this.inputField.setMaxWidth(500);
+        this.inputField = createTagTextField();
 
         Button lookupBtn = createLookupButton();
         Button clearBtn = createClearButton();
@@ -71,21 +69,24 @@ public class AppWindow {
 
         BorderPane.setMargin(vb, inset);
         BorderPane.setMargin(generateReportBtn, inset);
-
-        setupKeyListeners();
     }
 
-    private void setupKeyListeners() {
-        //remember to cite Task 3
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) -> {
-            if (event.isControlDown() && event.getCode() == KeyCode.ENTER) {
-                //question: I can make this into an AppWindow method, so I don't have to repeat it, but is passing the variable "input" considered a breach of separation?
-                String input = inputField.getText();
-                List<String> tagMatches = model.searchMatchingTags(input);
-                tagOutputField.getItems().addAll(tagMatches);
-            }
+    public TextField createTagTextField() {
+        TextField textField = new TextField();
+        textField.setPromptText("Enter your tag here");
+
+        textField.setPrefWidth(500);
+        textField.setMaxWidth(500);
+        textField.setOnAction(event ->  {
+            String input = inputField.getText();
+            List<String> tagMatches = model.searchMatchingTags(input);
+            tagOutputField.getItems().addAll(tagMatches);
         });
+
+        return textField;
     }
+
+
 
     //note: maybe feedback to user when queried tag returns no hits?
     public Button createLookupButton() {
