@@ -3,10 +3,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -70,4 +70,44 @@ public class AppModelTest {
         when(fixture.getContentURL(anyString())).thenReturn(pretend);
         assertEquals(fixture.getContentURL("anyt title that doesnt matter"), pretend);
     }
+
+    @Test
+    public void testBuildOutputReportMocked() {
+        fixture = mock(AppModel.class);
+        String pretend = "pretend this is the output report";
+        when(fixture.buildOutputReport()).thenReturn(pretend);
+        assertEquals(fixture.buildOutputReport(), pretend);
+    }
+
+    @Test
+    public void testBuildOutputReport() {
+        fixture = new AppModel(false, false);
+        fixture.setCurrentTag("University");
+        List<String> testVals = Arrays.asList("USYD", "UTS", "UNSW", "MCQ", "WSU");
+        fixture.setResultMatches(testVals);
+        String generated = fixture.buildOutputReport();
+
+        String expected = "Tag: University\nUSYD\nUTS\nUNSW\nMCQ\nWSU\n";
+
+        assertEquals(generated, expected);
+
+    }
+
+
+    @Test
+    public void generateOutputReportTestOffline() {
+        fixture = new AppModel(false, false);
+        assertNull(fixture.generateOutputReport());
+    }
+    @Test
+    public void generateOutputReportTestAllNulls() {
+        fixture = new AppModel(false, false);
+        fixture.setTagMatches(null);
+        fixture.setResultMatches(null);
+        fixture.setCurrentTag(null);
+
+        assertNull(fixture.generateOutputReport());
+    }
+
+
 }

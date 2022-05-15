@@ -5,10 +5,7 @@ import javafx.application.HostServices;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -79,8 +76,9 @@ public class AppWindow {
         textField.setMaxWidth(500);
         textField.setOnAction(event ->  {
             String input = inputField.getText();
-            List<String> tagMatches = model.searchMatchingTags(input);
-            tagOutputField.getItems().addAll(tagMatches);
+            model.setTagMatches(model.searchMatchingTags(input));
+            tagOutputField.getItems().clear();
+            tagOutputField.getItems().addAll(model.getTagMatches());
         });
 
         return textField;
@@ -97,8 +95,9 @@ public class AppWindow {
                 clearTagQuery();
             }
             String input = inputField.getText();
-            List<String> tagMatches = model.searchMatchingTags(input);
-            tagOutputField.getItems().addAll(tagMatches);
+            model.setTagMatches(model.searchMatchingTags(input));
+            tagOutputField.getItems().clear();
+            tagOutputField.getItems().addAll(model.getTagMatches());
         }));
         return lookupBtn;
     }
@@ -124,8 +123,8 @@ public class AppWindow {
             String tag = tagOutputField.getSelectionModel().getSelectedItem();
             model.setCurrentTag(tag);
             this.currentTagLabel.setText("Articles with tag: " + model.getCurrentTag());
-            List<String> resultList = model.getResultsWithTag(tag);
-            this.resultOutputField.setItems(FXCollections.observableList(resultList));
+            model.setResultMatches(model.getResultsWithTag(tag));
+            this.resultOutputField.setItems(FXCollections.observableList(model.getResultMatches()));
         });
         return tagOutputField;
     }
@@ -154,20 +153,22 @@ public class AppWindow {
         //possible source of M-V leak, not sure how to best approach
         //current flow is looking like AppModel -> View -> PastebinHandler
         //maybe View -> AppModel -> PastebinHandler, then AppModel returns some content to be displayed back to the view
+
         String pastebinURL = model.generateOutputReport();
         if (pastebinURL != null) {
-            hostService.showDocument(pastebinURL);
-        } else {
-            ;
+            TextInputDialog textInput = new TextInputDialog(pastebinURL);
+            textInput.setTitle("Pastebin URL");
+            textInput.setHeaderText("Pastebin of contents with tag: " + model.getCurrentTag());
+            textInput.showAndWait();
         }
-
-
     }
 
 
     private void clearTagQuery() {
         tagOutputField.getItems().clear();
         resultOutputField.getItems().clear();
+        model.setTagMatches(null);
+        model.setResultMatches(null);
         currentTagLabel.setText("Articles with tag: ");
     }
 

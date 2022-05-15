@@ -1,15 +1,20 @@
 package major_project.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class AppModel {
     private final GuardianHandler guardianHandler = new GuardianHandler();
 
+    private final PastebinHandler pastebinHandler = new PastebinHandler();
+
     private final boolean inputOnline;
 
     private final boolean outputOnline;
+
+    private List<String> tagMatches;
+
+    private List<String> resultMatches;
 
     public AppModel(boolean inputOnline, boolean outputOnline) {
         this.inputOnline = inputOnline;
@@ -56,11 +61,44 @@ public class AppModel {
         return guardianHandler.getCurrentTagResponse() != null;
     }
 
-    public String generateOutputReport() {
+
+    public String buildOutputReport() {
+        StringBuilder sb = new StringBuilder();
+        String tag = String.format("Tag: %s\n", currentTag);
+        sb.append(tag);
+
+        for (String res: resultMatches) {
+            String n = String.format("%s\n", res);
+            sb.append(n);
+        }
+
+        return sb.toString();
+    }
+
+    public String generateOutputReport() throws IllegalStateException {
+        if (tagMatches == null || resultMatches == null || currentTag == null) {
+            return null;
+        }
         if (outputOnline) {
-            return PastebinHandler.generateOutputReport(this);
+            return pastebinHandler.generateOutputReport(this, buildOutputReport());
         } else {
             return null;
         }
+    }
+
+    public List<String> getTagMatches() {
+        return tagMatches;
+    }
+
+    public void setTagMatches(List<String> tagMatches) {
+        this.tagMatches = tagMatches;
+    }
+
+    public List<String> getResultMatches() {
+        return resultMatches;
+    }
+
+    public void setResultMatches(List<String> resultMatches) {
+        this.resultMatches = resultMatches;
     }
 }

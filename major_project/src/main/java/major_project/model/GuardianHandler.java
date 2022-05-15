@@ -19,6 +19,9 @@ public class GuardianHandler {
 
 
     public ArrayList<String> getMatchingTags(String tag) {
+        if (tag == null) {
+            return null;
+        }
         //citation for hellohttp
         try {
             String URIVariable = String.format("https://content.guardianapis.com/tags?web-title=%s&api-key=%s", tag, System.getenv("INPUT_API_KEY"));
@@ -52,6 +55,9 @@ public class GuardianHandler {
     }
 
     public ArrayList<String> getResultsWithTag(String tag) {
+        if (tag == null) {
+            return null;
+        }
         try {
             String URIVariable = String.format("https://content.guardianapis.com/search?tag=%s&api-key=%s", tag, System.getenv("INPUT_API_KEY"));
             HttpRequest request = HttpRequest.newBuilder(new URI(URIVariable))
@@ -92,6 +98,9 @@ public class GuardianHandler {
     }
 
     public String getURL(String title) {
+        if (title == null) {
+            return null;
+        }
         //whenever this is called, the latest response would have been set from a getResultsWithTag, so we can just go through that and find the same POJO we displayer
         //marking because I feel like this might cause an error in the future
         List<ResultsPOJO> currentResults = lastResultResponse.returnResponse().getResults();

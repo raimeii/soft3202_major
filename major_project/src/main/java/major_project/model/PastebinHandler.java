@@ -1,40 +1,48 @@
 package major_project.model;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PastebinHandler {
-    public static String generateOutputReport(AppModel model) {
-        try {
-            String URL = String.format("https://pastebin.com/api/api_post.php?api_dev_key=%s&api_paste_code=test&api_option=paste", System.getenv("PASTEBIN_API_KEY"));
-            System.out.println(URL);
+    public String generateOutputReport(AppModel model, String toReport) {
+        if (model == null || toReport == null) {
+            return null;
+        }
 
-            HttpRequest request = HttpRequest.newBuilder(new URI(URL))
-                    .header("Content-Type", "application/x-www-form-urlencoded; UTF-8")
-                    .POST(HttpRequest.BodyPublishers.noBody())
-                    .build();
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost postReq = new HttpPost("https://pastebin.com/api/api_post.php");
+            List<NameValuePair> nvps = new ArrayList<>();
+            nvps.add(new BasicNameValuePair("api_dev_key", System.getenv("PASTEBIN_API_KEY")));
+            nvps.add(new BasicNameValuePair("api_option", "paste"));
+            nvps.add(new BasicNameValuePair("api_paste_code", toReport));
+            postReq.setEntity(new UrlEncodedFormEntity(nvps));
 
-            System.out.println(request.headers());
+            try (CloseableHttpResponse response = httpClient.execute(postReq)) {
+                HttpEntity entity = response.getEntity();
+                // do something useful with the response body
+                InputStream body = entity.getContent();
+                String link = new String(body.readAllBytes(), StandardCharsets.UTF_8);
+                // and ensure it is fully consumed
+                EntityUtils.consume(entity);
 
-            HttpClient client = HttpClient.newBuilder().build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-            System.out.println("Response status code was: " + response.statusCode());
-            System.out.println("Response headers were: " + response.headers());
-            System.out.println("Response body was:\n" + response.body());
-
-
-        } catch (IOException | InterruptedException e) {
+                return link;
+            }
+        } catch (IOException e) {
             System.out.println("Something went wrong with our request!");
             System.out.println(e.getMessage());
-        } catch (URISyntaxException ignored) {
-            // This would mean our URI is incorrect - this is here because often the URI you use will not be (fully)
-            // hard-coded and so needs a way to be checked for correctness at runtime.
         }
 
         return null;
