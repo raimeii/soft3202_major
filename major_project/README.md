@@ -1,4 +1,6 @@
-*** PLEASE MARK THE LATEST COMMIT ***
+*** Milestone 1 Commit ***
+SHA: 02f5b31
+URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/02f5b314b8ca1c01e30f8749f9675b4903ca5862
 
 Citations:
 Task 3 for inspiration for setting up GUI
