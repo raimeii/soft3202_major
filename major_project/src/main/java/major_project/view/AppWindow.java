@@ -6,15 +6,20 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.media.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.media.*;
 
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import major_project.model.AppModel;
 
-import java.util.List;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Optional;
+
+import static javafx.scene.input.KeyCode.ENTER;
 
 
 public class AppWindow {
@@ -31,6 +36,8 @@ public class AppWindow {
     private final ListView<String> resultOutputField;
 
     private final HostServices hostService;
+
+    private final MediaPlayer mediaPlayer;
 
     public AppWindow(AppModel model, HostServices hostService) {
         this.model = model;
@@ -52,6 +59,8 @@ public class AppWindow {
 
         this.resultOutputField = createResultOutputView();
 
+        this.mediaPlayer = createMediaPlayer();
+
         this.currentTagLabel = new Label("Articles with tag: ");
 
         VBox vb = new VBox(prompt, searchField, this.tagOutputField, this.currentTagLabel, this.resultOutputField);
@@ -59,13 +68,20 @@ public class AppWindow {
 
         Button generateReportBtn = createReportGeneration();
 
+        Button mediaControlBtn = createPlayPauseButton();
+
+        Button clearCacheBtn = createCacheClearButton();
+
         Insets inset = new Insets(10);
 
         pane.setCenter(vb);
-        pane.setBottom(generateReportBtn);
+
+        HBox bottomBox = new HBox(generateReportBtn, mediaControlBtn, clearCacheBtn);
+        bottomBox.setSpacing(10);
+        pane.setBottom(bottomBox);
 
         BorderPane.setMargin(vb, inset);
-        BorderPane.setMargin(generateReportBtn, inset);
+        BorderPane.setMargin(bottomBox, inset);
     }
 
     public TextField createTagTextField() {
@@ -123,8 +139,45 @@ public class AppWindow {
             String tag = tagOutputField.getSelectionModel().getSelectedItem();
             model.setCurrentTag(tag);
             this.currentTagLabel.setText("Articles with tag: " + model.getCurrentTag());
-            model.setResultMatches(model.getResultsWithTag(tag));
+            if (model.checkTagExistsInDatabase(tag)) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Tag found in database");
+                alert.setHeaderText("Cache hit for this tag – use cache, or request fresh data from the API?");
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK){
+                    model.setResultMatches(model.getResultsWithTagDB(tag));
+                } else if (result.isPresent() && result.get() == ButtonType.CANCEL) {
+                    model.setResultMatches(model.getResultsWithTagAPI(tag));
+                }
+            } else {
+                model.setResultMatches(model.getResultsWithTagAPI(tag));
+            }
+
             this.resultOutputField.setItems(FXCollections.observableList(model.getResultMatches()));
+        });
+
+        tagOutputField.setOnKeyPressed(event -> {
+            if (event.getCode() == ENTER) {
+                String tag = tagOutputField.getSelectionModel().getSelectedItem();
+                model.setCurrentTag(tag);
+                this.currentTagLabel.setText("Articles with tag: " + model.getCurrentTag());
+                if (model.checkTagExistsInDatabase(tag)) {
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Tag found in cache");
+                    alert.setHeaderText("Cache hit for this tag – use cache, or request fresh data from the API?");
+
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.isPresent() && result.get() == ButtonType.OK){
+                        model.setResultMatches(model.getResultsWithTagDB(tag));
+                    } else if (result.isPresent() && result.get() == ButtonType.CANCEL) {
+                        model.setResultMatches(model.getResultsWithTagAPI(tag));
+                    }
+                } else {
+                    model.setResultMatches(model.getResultsWithTagAPI(tag));
+                }
+                this.resultOutputField.setItems(FXCollections.observableList(model.getResultMatches()));
+            }
         });
         return tagOutputField;
     }
@@ -139,7 +192,63 @@ public class AppWindow {
             String url = model.getContentURL(title);
             hostService.showDocument(url);
         });
+
+
+        resultOutputField.setOnKeyPressed(event -> {
+            if (event.getCode() == ENTER) {
+                String title = resultOutputField.getSelectionModel().getSelectedItem();
+                String url = model.getContentURL(title);
+                hostService.showDocument(url);
+            }
+        });
         return resultOutputField;
+    }
+
+    public MediaPlayer createMediaPlayer() {
+        Media musicMedia = new Media(model.getMusicResource());
+        MediaPlayer mediaPlayer = new MediaPlayer(musicMedia);
+        mediaPlayer.setOnEndOfMedia(new Runnable() {
+            @Override
+            public void run() {
+                mediaPlayer.seek(Duration.ZERO);
+            }
+        });
+        mediaPlayer.setVolume(0.2);
+        mediaPlayer.play();
+        return mediaPlayer;
+    }
+
+    public Button createPlayPauseButton() {
+        Button playPause = new Button("Play/Pause music");
+
+        playPause.setOnAction(event -> {
+            if (model.isAudioPlaying()) {
+                mediaPlayer.pause();
+                model.setAudioPlaying(false);
+            } else {
+                mediaPlayer.play();
+                model.setAudioPlaying(true);
+            }
+        });
+
+        return playPause;
+    }
+
+    public Button createCacheClearButton() {
+        Button cacheClear = new Button("Clear cache");
+
+        cacheClear.setOnAction(event -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Clear cache?");
+            alert.setHeaderText("Are you sure you want to clear the cache?");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK){
+                model.clearDatabaseCache();
+            }
+
+        });
+
+        return cacheClear;
     }
 
     public Button createReportGeneration() {
@@ -150,10 +259,6 @@ public class AppWindow {
     }
 
     private void generateReport() {
-        //possible source of M-V leak, not sure how to best approach
-        //current flow is looking like AppModel -> View -> PastebinHandler
-        //maybe View -> AppModel -> PastebinHandler, then AppModel returns some content to be displayed back to the view
-
         String pastebinURL = model.generateOutputReport();
         if (pastebinURL != null) {
             TextInputDialog textInput = new TextInputDialog(pastebinURL);
@@ -171,8 +276,6 @@ public class AppWindow {
         model.setResultMatches(null);
         currentTagLabel.setText("Articles with tag: ");
     }
-
-
 
     public Scene getScene() {
         return this.scene;

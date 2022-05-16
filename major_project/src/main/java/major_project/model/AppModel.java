@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AppModel {
-    private final GuardianHandler guardianHandler = new GuardianHandler();
+    private final GuardianHandler guardianHandler;
 
     private final PastebinHandler pastebinHandler = new PastebinHandler();
 
@@ -16,9 +16,24 @@ public class AppModel {
 
     private List<String> resultMatches;
 
+    private boolean audioPlaying = true;
+
+    private final Database database;
+
+
+
     public AppModel(boolean inputOnline, boolean outputOnline) {
         this.inputOnline = inputOnline;
         this.outputOnline = outputOnline;
+
+        if (inputOnline) {
+            database = new Database();
+            database.createDatabase();
+            database.setupDatabase();
+        } else {
+            database = null;
+        }
+        guardianHandler = new GuardianHandler(database);
     }
 
     private String currentTag = null;
@@ -31,6 +46,15 @@ public class AppModel {
         return this.currentTag;
     }
 
+    public boolean checkTagExistsInDatabase(String input) {
+        if (inputOnline) {
+            return database.queryCheckTagExists(input);
+        } else {
+            return false;
+        }
+    }
+
+    //api search
     public ArrayList<String> searchMatchingTags(String input) {
         //basically return the list of ResultsPOJO's id tag, use web-title link
         if (inputOnline) {
@@ -39,11 +63,21 @@ public class AppModel {
             return new ArrayList<>(List.of("testTag1" , "testTag2", "testTag3"));
         }
     }
+    //database search
 
-    public ArrayList<String> getResultsWithTag(String tag) {
+    public ArrayList<String> getResultsWithTagAPI(String tag) {
         //use q link
         if (inputOnline) {
-            return guardianHandler.getResultsWithTag(tag);
+            return guardianHandler.getResultsWithTagAPI(tag);
+        } else {
+            return new ArrayList<>(List.of("testResult1" , "testResult2", "testResult3", "testResult4"));
+        }
+    }
+
+    public ArrayList<String> getResultsWithTagDB(String tag) {
+        //use q link
+        if (inputOnline) {
+            return guardianHandler.getResultsWithTagDB(tag);
         } else {
             return new ArrayList<>(List.of("testResult1" , "testResult2", "testResult3", "testResult4"));
         }
@@ -86,6 +120,10 @@ public class AppModel {
         }
     }
 
+    public void clearDatabaseCache() {
+        database.clearCache();
+    }
+
     public List<String> getTagMatches() {
         return tagMatches;
     }
@@ -101,4 +139,17 @@ public class AppModel {
     public void setResultMatches(List<String> resultMatches) {
         this.resultMatches = resultMatches;
     }
+
+    public String getMusicResource() {
+        return getClass().getClassLoader().getResource("amelia_watson_bgm.mp3").toString();
+    }
+
+    public boolean isAudioPlaying() {
+        return audioPlaying;
+    }
+
+    public void setAudioPlaying(boolean audioPlaying) {
+        this.audioPlaying = audioPlaying;
+    }
+
 }
