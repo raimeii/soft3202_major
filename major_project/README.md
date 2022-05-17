@@ -2,6 +2,10 @@
 SHA: 02f5b31 <br>
 URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/02f5b314b8ca1c01e30f8749f9675b4903ca5862 <br>
 
+*** Milestone 2 Commit *** <br>
+SHA: 5c7d1cd <br>
+URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/5c7d1cd5bc759093c424eec7c9ad8eb147fc818b <br>
+
 Credit Extra Features:<br>
 Ability to toggle between elements using Tab, arrow keys to navigate list views and enter to select current selection. <br>
 Theme song that plays on a loop, with requisite play/pause button. <br>
