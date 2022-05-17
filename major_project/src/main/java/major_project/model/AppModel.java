@@ -1,155 +1,150 @@
 package major_project.model;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class AppModel {
-    private final GuardianHandler guardianHandler;
+public interface AppModel {
 
-    private final PastebinHandler pastebinHandler = new PastebinHandler();
+    /**
+     * Setter for model's current tag
+     * @param tag the new tag to be set
+     */
+    public void setCurrentTag(String tag);
 
-    private final boolean inputOnline;
+    /**
+     * Getter for model's current tag
+     * @return the model's current tag
+     */
+    public String getCurrentTag();
 
-    private final boolean outputOnline;
+    /**
+     * Checks the if the input tag has already been cached in the database
+     * @param input the tag to check for
+     * @return true if the tag has been cached before, false otherwise
+     */
+    public boolean checkTagExistsInDatabase(String input);
 
-    private List<String> tagMatches;
+    /**
+     * Prompts the model's GuardianHandler to make an API call to the TheGuardian API to return a list of tag
+     * strings that are a partial match to the input.
+     *
+     * @param input partial tag
+     * @return list of partial matches to tag
+     */
+    public ArrayList<String> searchMatchingTags(String input);
 
-    private List<String> resultMatches;
+    /**
+     * Prompts the model's GuardianHandler to make an API call to the TheGuardian API to return a list of the string
+     * representations of ResultsPOJOs retrieved from the API call.
+     *
+     * @param tag tag to search results by
+     * @return list of string representations of ResultsPOJOs
+     */
+    public ArrayList<String> getResultsWithTagAPI(String tag);
 
-    private boolean audioPlaying = true;
+    /**
+     * Prompts the model's Database to query the SQLite database cache to return the list of the string representations
+     * of ResultsPOJOs retrieved from a previous API call with the matching tag.
+     *
+     * @param tag tag to search results by
+     * @return list of string representations of ResultsPOJOs
+     */
+    public ArrayList<String> getResultsWithTagDB(String tag);
 
-    private final Database database;
+    /**
+     * Prompts the model's GuardianHandler to return the web URL of the ResultsPOJO with the matching string representation
+     * as title
+     *
+     * @param title string representation to search by
+     * @return the web url for the relevant result
+     */
+    public String getContentURL(String title);
 
-
-
-    public AppModel(boolean inputOnline, boolean outputOnline) {
-        this.inputOnline = inputOnline;
-        this.outputOnline = outputOnline;
-
-        if (inputOnline) {
-            database = new Database();
-            database.createDatabase();
-            database.setupDatabase();
-        } else {
-            database = null;
-        }
-        guardianHandler = new GuardianHandler(database);
-    }
-
-    private String currentTag = null;
-
-    public void setCurrentTag(String tag) {
-        this.currentTag = tag;
-    }
-
-    public String getCurrentTag() {
-        return this.currentTag;
-    }
-
-    public boolean checkTagExistsInDatabase(String input) {
-        if (inputOnline) {
-            return database.queryCheckTagExists(input);
-        } else {
-            return false;
-        }
-    }
-
-    //api search
-    public ArrayList<String> searchMatchingTags(String input) {
-        //basically return the list of ResultsPOJO's id tag, use web-title link
-        if (inputOnline) {
-            return guardianHandler.getMatchingTags(input);
-        } else {
-            return new ArrayList<>(List.of("testTag1" , "testTag2", "testTag3"));
-        }
-    }
-    //database search
-
-    public ArrayList<String> getResultsWithTagAPI(String tag) {
-        //use q link
-        if (inputOnline) {
-            return guardianHandler.getResultsWithTagAPI(tag);
-        } else {
-            return new ArrayList<>(List.of("testResult1" , "testResult2", "testResult3", "testResult4"));
-        }
-    }
-
-    public ArrayList<String> getResultsWithTagDB(String tag) {
-        //use q link
-        if (inputOnline) {
-            return guardianHandler.getResultsWithTagDB(tag);
-        } else {
-            return new ArrayList<>(List.of("testResult1" , "testResult2", "testResult3", "testResult4"));
-        }
-    }
-
-    public String getContentURL(String title) {
-        if (inputOnline) {
-            return guardianHandler.getURL(title);
-        } else {
-            return "https://youtu.be/dQw4w9WgXcQ";
-        }
-    }
-
-    public boolean hasTagResponseStored() {
-        return guardianHandler.getCurrentTagResponse() != null;
-    }
+    /**
+     * Checks if the GuardianHandler has a tag response GuardianPOJO currently
+     *
+     * @return true if a response is stored, false otherwise
+     */
+    public boolean hasTagResponseStored();
 
 
-    public String buildOutputReport() {
-        StringBuilder sb = new StringBuilder();
-        String tag = String.format("Tag: %s\n", currentTag);
-        sb.append(tag);
+    /**
+     * Builds a singular string from the resultsMatches list attribute to output to the output api
+     *
+     * @return the string to be sent to the output api
+     */
+    public String buildOutputReport();
 
-        for (String res: resultMatches) {
-            String n = String.format("%s\n", res);
-            sb.append(n);
-        }
+    /**
+     * sends a the result of a call to buildOutputReport to the PastebinHandler to return a URL with the pastebin dump
+     *
+     * @return the url to the generated pastebin dump
+     */
+    public String generateOutputReport();
 
-        return sb.toString();
-    }
+    /**
+     * Prompts the model's Database to remove all previous cached entries
+     */
+    public void clearDatabaseCache();
 
-    public String generateOutputReport() throws IllegalStateException {
-        if (tagMatches == null || resultMatches == null || currentTag == null) {
-            return null;
-        }
-        if (outputOnline) {
-            return pastebinHandler.generateOutputReport(this, buildOutputReport());
-        } else {
-            return null;
-        }
-    }
+    /**
+     * Getter for the string list of string representations of the current tag partial matches
+     * to be displayed in the view.
+     * @return list of current partial tag matches
+     */
+    public List<String> getTagMatches();
 
-    public void clearDatabaseCache() {
-        database.clearCache();
-    }
+    /**
+     * Sets the model's current tag matches to the argument
+     *
+     * @param tagMatches the new list of string representations of the current tag partial matches to be displayed in
+     * the view
+     */
+    public void setTagMatches(List<String> tagMatches);
 
-    public List<String> getTagMatches() {
-        return tagMatches;
-    }
+    /**
+     * Getter for the string list of string representations of the current results with the current tag to be displayed
+     * in the view
+     *
+     * @return list of results with current tag match
+     */
+    public List<String> getResultMatches();
 
-    public void setTagMatches(List<String> tagMatches) {
-        this.tagMatches = tagMatches;
-    }
+    /**
+     * sets the model's current result matches to the argument
+     *
+     * @param resultMatches the new list of string representations of the current tag's results to be displayed in the
+     * view
+     */
+    public void setResultMatches(List<String> resultMatches);
 
-    public List<String> getResultMatches() {
-        return resultMatches;
-    }
+    /**
+     * returns the path to the audio file used for the extra feature implementation
+     *
+     * @return the string to be used as the path to retrieve the audio file
+     */
+    public String getMusicResource();
 
-    public void setResultMatches(List<String> resultMatches) {
-        this.resultMatches = resultMatches;
-    }
+    /**
+     * getter method for if the model is currently playing music
+     *
+     * @return true if model is prompting to play music, false otherwise
+     */
+    public boolean isAudioPlaying();
 
-    public String getMusicResource() {
-        return getClass().getClassLoader().getResource("amelia_watson_bgm.mp3").toString();
-    }
+    /**
+     * sets the current state of the model's music to play (true) or pause (false
+     *
+     * @param audioPlaying the new state
+     */
+    public void setAudioPlaying(boolean audioPlaying);
 
-    public boolean isAudioPlaying() {
-        return audioPlaying;
-    }
-
-    public void setAudioPlaying(boolean audioPlaying) {
-        this.audioPlaying = audioPlaying;
-    }
-
+    /**
+     * returns the model's current GuardianHandler
+     *
+     * @return model's GuardianHandler
+     */
+    public GuardianHandler getGuardianHandler();
 }

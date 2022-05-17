@@ -3,6 +3,7 @@ import javafx.application.Application;
 import javafx.application.HostServices;
 import javafx.stage.Stage;
 import major_project.model.AppModel;
+import major_project.model.AppModelImpl;
 import major_project.view.AppWindow;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class Main extends Application {
         inputOnline = listParams.get(0).equalsIgnoreCase("online");
         outputOnline = listParams.get(1).equalsIgnoreCase("online");
 
-        AppModel model = new AppModel(inputOnline, outputOnline);
+        AppModel model = new AppModelImpl(inputOnline, outputOnline);
         AppWindow view = new AppWindow(model, hostService);
 
         primaryStage.setScene(view.getScene());

@@ -1,136 +1,51 @@
 package major_project.model;
-
-import com.google.gson.Gson;
-
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-public class GuardianHandler {
-    //handles HTTP/mocked calls to the Guardian API
-    private GuardianPOJO currentTagResponse;
+public interface GuardianHandler {
 
-    private final Database database;
+    /**
+     * Makes a get request to the TheGuardian API to retrieve the first 10 partial matches to the tag parameter, setting
+     * the handler's currentTagResponse GuardianPOJO to the return response parsed by GSON.
+     *
+     * @param tag the tag to search partial matches for
+     * @return an array list of the strings of the tags that are a partial match to the parameter
+     */
+    ArrayList<String> getMatchingTags(String tag);
 
-    List<ResultsPOJO> tagResults;
+    /**
+     * Makes a get request to the TheGuardian API to retrieve the first 10 results with the tag specified. The return
+     * response is a GuardianPOJO, then the handler's tagResults list of ResultsPOJOS is set to
+     * GuardianPOJO.returnResponse().getResults(). Afterwards, checks if the tag is cached in the cache, and caches the
+     * tag and results if it does not. Finally, collects the string representation  of the tagResults list, sorts
+     * alphabetically, and returns it as an array list of strings.
+     *
+     * @param tag tag to search results by
+     * @return string representation of results
+     */
+    ArrayList<String> getResultsWithTagAPI(String tag);
 
-    public GuardianHandler(Database d) {
-        database = d;
-    }
+    /**
+     * Retrieves a cached result with tag that matches the parameter, collects its string representations, sorts
+     * alphabetically, and returns it as an array list of strings.
+     *
+     * @param tag tag to search results by
+     * @return
+     */
+    ArrayList<String> getResultsWithTagDB(String tag);
 
+    /**
+     * Loop through the resultsList of ResultsPOJOS, and returns the url of the ResultsPOJO whose string representation
+     * matches the title.
+     *
+     * @param title title to compare string representation of ResultsPOJO by
+     * @return url of the requisite ResultsPOJO
+     */
+    String getURL(String title);
 
-    public ArrayList<String> getMatchingTags(String tag) {
-        if (tag == null) {
-            return null;
-        }
-        //citation for hellohttp
-        try {
-            String URIVariable = String.format("https://content.guardianapis.com/tags?web-title=%s&api-key=%s", tag, System.getenv("INPUT_API_KEY"));
-            HttpRequest request = HttpRequest.newBuilder(new URI(URIVariable))
-                    .GET()
-                    .build();
-            HttpClient client = HttpClient.newBuilder().build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            Gson gson = new Gson();
-            //set current response to a new
-            currentTagResponse = gson.fromJson(response.body(), GuardianPOJO.class);
-            ArrayList<String> ret = new ArrayList<>();
-
-            for (ResultsPOJO result : currentTagResponse.returnResponse().getResults()) {
-                ret.add(result.getID());
-            }
-
-            return ret;
-
-
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Something went wrong with our request!");
-            System.out.println(e.getMessage());
-            return null;
-        } catch (URISyntaxException ignored) {
-            ;
-        }
-
-        return null;
-    }
-
-    public ArrayList<String> getResultsWithTagAPI(String tag) {
-        if (tag == null) {
-            return null;
-        }
-
-        try {
-            String URIVariable = String.format("https://content.guardianapis.com/search?tag=%s&api-key=%s", tag, System.getenv("INPUT_API_KEY"));
-            HttpRequest request = HttpRequest.newBuilder(new URI(URIVariable))
-                    .GET()
-                    .build();
-            HttpClient client = HttpClient.newBuilder().build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            Gson gson = new Gson();
-            //set current response to a new
-            GuardianPOJO lastResultResponse = gson.fromJson(response.body(), GuardianPOJO.class);
-            tagResults = lastResultResponse.returnResponse().getResults();
-
-            if (!database.queryCheckTagExists(tag)){
-                database.addTag(tag);
-                database.addResults(tagResults, tag);
-            }
-
-
-
-
-            ArrayList<String> ret = new ArrayList<>();
-
-            for (ResultsPOJO result : tagResults) {
-                ret.add(result.toString());
-            }
-            Collections.sort(ret);
-
-            return ret;
-
-
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Something went wrong with our request!");
-            System.out.println(e.getMessage());
-            return null;
-        } catch (URISyntaxException ignored) {
-            ;
-        }
-        return null;
-    }
-
-    public ArrayList<String> getResultsWithTagDB(String tag) {
-        ArrayList<String> ret = new ArrayList<>();
-        tagResults = database.retrieveResults(tag);
-        for (ResultsPOJO result: tagResults) {
-            ret.add(result.toString());
-        }
-        Collections.sort(ret);
-        return ret;
-    }
-
-    public GuardianPOJO getCurrentTagResponse() {
-        return currentTagResponse;
-    }
-
-
-    public String getURL(String title) {
-        if (title == null) {
-            return null;
-        }
-        for (ResultsPOJO result: tagResults) {
-            if (result.toString().equals(title)) {
-                return result.getWebURL();
-            }
-        }
-        return null;
-    }
+    /**
+     * Returns the GuardianPOJO current tag response
+     *
+     * @return GuardianPOJO of the current tag response from the api.
+     */
+    GuardianPOJO getCurrentTagResponse();
 }

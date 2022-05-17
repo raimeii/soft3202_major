@@ -8,15 +8,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.media.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.media.*;
 
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import major_project.model.AppModel;
+import major_project.model.AppModelImpl;
 
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Optional;
 
 import static javafx.scene.input.KeyCode.ENTER;

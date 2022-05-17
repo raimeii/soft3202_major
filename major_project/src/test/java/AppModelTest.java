@@ -1,5 +1,8 @@
 import major_project.model.AppModel;
+import major_project.model.AppModelImpl;
+import major_project.model.GuardianHandler;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -22,34 +25,35 @@ public class AppModelTest {
 
     @Test
     public void testOfflineTagSearch() {
-        fixture = new AppModel(false, false);
+        fixture = new AppModelImpl(false, false);
         ArrayList<String> testList = fixture.searchMatchingTags("input that doesnt matter");
         assertEquals(testList.size(), 3);
     }
 
     @Test
     public void testOfflineResultWithTagSearch() {
-        fixture = new AppModel(false, false);
-        ArrayList<String> testList = fixture.getResultsWithTag("input that doesnt matter");
+        fixture = new AppModelImpl(false, false);
+        ArrayList<String> testList = fixture.getResultsWithTagAPI("input that doesnt matter");
         assertEquals(testList.size(), 4);
     }
 
     @Test
     public void testOfflineGetContentURL() {
-        fixture = new AppModel(false, false);
+        fixture = new AppModelImpl(false, false);
         assertEquals(fixture.getContentURL("anyt title that doesnt matter"), "https://youtu.be/dQw4w9WgXcQ");
     }
 
     @Test
     public void testOfflineHasTagResponseStored() {
-        fixture = new AppModel(false, false);
+        fixture = new AppModelImpl(false, false);
         ArrayList<String> testList = fixture.searchMatchingTags("input that doesnt matter");
         assertFalse(fixture.hasTagResponseStored());
+        assertEquals(3, testList.size());
     }
 
     @Test
     public void testOnlineTagSearch() {
-        fixture = mock(AppModel.class);
+        fixture = mock(AppModelImpl.class);
         when(fixture.searchMatchingTags(anyString())).thenReturn(new ArrayList<>(List.of("oneTag")));
         ArrayList<String> testList = fixture.searchMatchingTags("input that doesnt matter");
         assertEquals(testList.size(), 1);
@@ -57,23 +61,23 @@ public class AppModelTest {
 
     @Test
     public void testOnlineResultWithTagSearch() {
-        fixture = mock(AppModel.class);
-        when(fixture.getResultsWithTag(anyString())).thenReturn(new ArrayList<>(List.of("oneResult", "twoResult")));
-        ArrayList<String> testList = fixture.getResultsWithTag("input that doesnt matter");
+        fixture = mock(AppModelImpl.class);
+        when(fixture.getResultsWithTagAPI(anyString())).thenReturn(new ArrayList<>(List.of("oneResult", "twoResult")));
+        ArrayList<String> testList = fixture.getResultsWithTagAPI("input that doesnt matter");
         assertEquals(testList.size(), 2);
     }
 
     @Test
     public void testOnlineGetContentURL() {
-        fixture = mock(AppModel.class);
+        fixture = mock(AppModelImpl.class);
         String pretend = "pretend this is a url";
         when(fixture.getContentURL(anyString())).thenReturn(pretend);
-        assertEquals(fixture.getContentURL("anyt title that doesnt matter"), pretend);
+        assertEquals(fixture.getContentURL("any title that doesnt matter"), pretend);
     }
 
     @Test
     public void testBuildOutputReportMocked() {
-        fixture = mock(AppModel.class);
+        fixture = mock(AppModelImpl.class);
         String pretend = "pretend this is the output report";
         when(fixture.buildOutputReport()).thenReturn(pretend);
         assertEquals(fixture.buildOutputReport(), pretend);
@@ -81,7 +85,7 @@ public class AppModelTest {
 
     @Test
     public void testBuildOutputReport() {
-        fixture = new AppModel(false, false);
+        fixture = new AppModelImpl(false, false);
         fixture.setCurrentTag("University");
         List<String> testVals = Arrays.asList("USYD", "UTS", "UNSW", "MCQ", "WSU");
         fixture.setResultMatches(testVals);
@@ -96,18 +100,43 @@ public class AppModelTest {
 
     @Test
     public void generateOutputReportTestOffline() {
-        fixture = new AppModel(false, false);
-        assertNull(fixture.generateOutputReport());
+        fixture = new AppModelImpl(false, false);
+        assertEquals("", fixture.generateOutputReport());
     }
     @Test
-    public void generateOutputReportTestAllNulls() {
-        fixture = new AppModel(false, false);
+    public void generateOutputReportTestAllNullsOnline() {
+        fixture = new AppModelImpl(true, true);
         fixture.setTagMatches(null);
         fixture.setResultMatches(null);
         fixture.setCurrentTag(null);
-
-        assertNull(fixture.generateOutputReport());
+        assertEquals("", fixture.generateOutputReport());
     }
 
+
+    @Test
+    public void callAPIWhenOffline() {
+        fixture = new AppModelImpl(false, false);
+        GuardianHandler gh = fixture.getGuardianHandler();
+
+        IllegalStateException thrown = Assertions.assertThrows(IllegalStateException.class, () -> gh.getResultsWithTagAPI("some string"));
+
+        assertEquals("Illegal state: calling API method when app is offline", thrown.getMessage());
+
+        IllegalStateException thrown2 = Assertions.assertThrows(IllegalStateException.class, () -> gh.getResultsWithTagDB("some string"));
+
+        assertEquals("Illegal state: calling API method when app is offline", thrown2.getMessage());
+
+        ArrayList<String> resultsWithTagDB = fixture.getResultsWithTagDB("some tag");
+        assertEquals(4, resultsWithTagDB.size());
+
+        assertFalse(fixture.checkTagExistsInDatabase("doesnt matter"));
+    }
+
+
+
+
+
+
+    //to test null database, need GuardianHandler getter from app model fixture
 
 }
