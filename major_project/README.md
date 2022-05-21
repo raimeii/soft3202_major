@@ -8,10 +8,17 @@ URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/5c7d1cd5bc759093c424
 
 Credit Extra Features:<br>
 Ability to toggle between elements using Tab, arrow keys to navigate list views and enter to select current selection. <br>
+Shortcuts for functionality as follows: Ctrl + <br>
+L for lookup button <br>
+C for tag query clear <br>
+G for generating report <br>
+P for music play/pause <br>
+V for cache clear <br>
+
 Theme song that plays on a loop, with requisite play/pause button. <br>
 
 Citations: <br>
-Task 3 for inspiration for setting up GUI <br>
+Task 3 for inspiration for setting up GUI and keyboard shortcuts <br>
 HelloHTTP from the modules for most of the HTTP handling in both input/output handler classes. <br> 
 https://hc.apache.org/httpcomponents-client-5.1.x/quickstart.html# - Apache docs for setting up Apache HTTP client <br> 
 https://dova-s.jp/EN/bgm/play12459.html - おもちゃのダンス @ フリ BGM by DOVA-SYNDROME, renamed to amelia_watson_bgm.mp3 in ./src/main/resources <br>

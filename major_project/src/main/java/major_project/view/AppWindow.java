@@ -79,9 +79,37 @@ public class AppWindow {
         HBox bottomBox = new HBox(generateReportBtn, mediaControlBtn, clearCacheBtn);
         bottomBox.setSpacing(10);
         pane.setBottom(bottomBox);
+        buildKeyListeners();
 
         BorderPane.setMargin(vb, inset);
         BorderPane.setMargin(bottomBox, inset);
+    }
+
+
+    private void buildKeyListeners() {
+        // This allows keyboard input. Note that the scene is used, so any time
+        // the window is in focus the keyboard input will be registered.
+        // More often, keyboard input is more closely linked to a specific
+        // node that must have focus, i.e. the Enter key in a text input to submit
+        // a form.
+
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.L) {
+                lookUp();
+            }
+            if (event.isControlDown() && event.getCode() == KeyCode.C) {
+                clearTagQuery();
+            }
+            if (event.isControlDown() && event.getCode() == KeyCode.G) {
+                generateReport();
+            }
+            if (event.isControlDown() && event.getCode() == KeyCode.P) {
+                playPause();;
+            }
+            if (event.isControlDown() && event.getCode() == KeyCode.V) {
+                cacheClear();
+            }
+        });
     }
 
     public TextField createTagTextField() {
@@ -100,20 +128,11 @@ public class AppWindow {
         return textField;
     }
 
-
-
     //note: maybe feedback to user when queried tag returns no hits?
     public Button createLookupButton() {
         Button lookupBtn = new Button("Lookup");
         lookupBtn.setOnAction((event -> {
-            if (model.hasTagResponseStored()) {
-                //clear list for new tag search
-                clearTagQuery();
-            }
-            String input = inputField.getText();
-            model.setTagMatches(model.searchMatchingTags(input));
-            tagOutputField.getItems().clear();
-            tagOutputField.getItems().addAll(model.getTagMatches());
+            lookUp();
         }));
         return lookupBtn;
     }
@@ -124,6 +143,7 @@ public class AppWindow {
             clearTagQuery();
             model.setCurrentTag(null);
             inputField.clear();
+            currentTagLabel.requestFocus();
 
         }));
 
@@ -222,13 +242,7 @@ public class AppWindow {
         Button playPause = new Button("Play/Pause music");
 
         playPause.setOnAction(event -> {
-            if (model.isAudioPlaying()) {
-                mediaPlayer.pause();
-                model.setAudioPlaying(false);
-            } else {
-                mediaPlayer.play();
-                model.setAudioPlaying(true);
-            }
+            playPause();
         });
 
         return playPause;
@@ -238,18 +252,12 @@ public class AppWindow {
         Button cacheClear = new Button("Clear cache");
 
         cacheClear.setOnAction(event -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Clear cache?");
-            alert.setHeaderText("Are you sure you want to clear the cache?");
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK){
-                model.clearDatabaseCache();
-            }
-
+            cacheClear();
         });
 
         return cacheClear;
     }
+
 
     public Button createReportGeneration() {
         Button generateReportBtn = new Button("Generate Report");
@@ -268,8 +276,40 @@ public class AppWindow {
         }
     }
 
+    private void lookUp() {
+        if (model.hasTagResponseStored()) {
+            //clear list for new tag search
+            clearTagQuery();
+        }
+        String input = inputField.getText();
+        model.setTagMatches(model.searchMatchingTags(input));
+        tagOutputField.getItems().clear();
+        tagOutputField.getItems().addAll(model.getTagMatches());
+    }
+
+    private void playPause() {
+        if (model.isAudioPlaying()) {
+            mediaPlayer.pause();
+            model.setAudioPlaying(false);
+        } else {
+            mediaPlayer.play();
+            model.setAudioPlaying(true);
+        }
+    }
+
+    private void cacheClear() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Clear cache?");
+        alert.setHeaderText("Are you sure you want to clear the cache?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK){
+            model.clearDatabaseCache();
+        }
+    }
+
 
     private void clearTagQuery() {
+        inputField.setText("");
         tagOutputField.getItems().clear();
         resultOutputField.getItems().clear();
         model.setTagMatches(null);
