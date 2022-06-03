@@ -1,10 +1,27 @@
-*** Milestone 1 Commit *** <br>
-SHA: 02f5b31 <br>
-URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/02f5b314b8ca1c01e30f8749f9675b4903ca5862 <br>
+Input API: TheGuardian <br>
+Output API: Pastebin <br> 
+Claimed Tier: Credit <br>
+Credit Optional Feature 1: Keyboard shortcuts and tabbing navigation <br>
+Credit Optional Feature 2: Theme music <br>
 
-*** Milestone 2 Commit *** <br>
-SHA: 5c7d1cd <br>
-URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/5c7d1cd5bc759093c424eec7c9ad8eb147fc818b <br>
+Milestone 1 Submission: <br>
+    SHA: 76f268e <br>
+    URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/76f268e4798478d79130721917653a176352f470#diff-d010c0645d9236cff2a125742604305aaa5ee379991f3b702b729f5717bad94c <br>
+Milestone 1 Re-Submission: <br>
+    SHA: 02f5b31 <br>
+    URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/02f5b314b8ca1c01e30f8749f9675b4903ca5862 <br>
+Milestone 2 Submission: <br>
+    SHA: 5c7d1cd <br>
+    URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/5c7d1cd5bc759093c424eec7c9ad8eb147fc818b <br>
+Milestone 2 Re-Submission: <br>
+    SHA: <> <br>
+    URI: <> <br>
+Exam Base Commit: <br>
+    SHA: <> <br>
+    URI: <> <br>
+Exam Submission Commit: <br>
+    SHA: <> <br>
+    URI: <> <br>
 
 Credit Extra Features:<br>
 Ability to toggle between elements using Tab, arrow keys to navigate list views and enter to select current selection. <br>
