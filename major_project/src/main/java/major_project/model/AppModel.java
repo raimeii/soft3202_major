@@ -1,9 +1,9 @@
 package major_project.model;
 
-import java.security.InvalidParameterException;
+import major_project.model.GuardianHandler.GuardianHandler;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public interface AppModel {
 
@@ -125,22 +125,21 @@ public interface AppModel {
      *
      * @return the string to be used as the path to retrieve the audio file
      */
-    public String getMusicResource();
+    String getMusicResource();
 
     /**
-     * getter method for if the model is currently playing music
+     * getter method for if the resource handler is currently playing music
      *
      * @return true if model is prompting to play music, false otherwise
      */
-    public boolean isAudioPlaying();
+    boolean isAudioPlaying();
 
     /**
-     * sets the current state of the model's music to play (true) or pause (false
+     * sets the current state of the resource handler's music to play (true) or pause (false
      *
      * @param audioPlaying the new state
      */
-    public void setAudioPlaying(boolean audioPlaying);
-
+    void setAudioPlaying(boolean audioPlaying);
     /**
      * returns the model's current GuardianHandler
      *

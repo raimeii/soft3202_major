@@ -1,4 +1,6 @@
-package major_project.model;
+package major_project.model.GuardianHandler;
+import major_project.model.POJOS.GuardianPOJO;
+
 import java.util.ArrayList;
 
 public interface GuardianHandler {

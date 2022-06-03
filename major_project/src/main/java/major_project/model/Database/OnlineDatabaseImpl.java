@@ -1,11 +1,13 @@
-package major_project.model;
+package major_project.model.Database;
+
+import major_project.model.POJOS.ResultsPOJO;
 
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DatabaseImpl implements Database {
+public class OnlineDatabaseImpl implements Database {
 
     /**
      * name of the db file

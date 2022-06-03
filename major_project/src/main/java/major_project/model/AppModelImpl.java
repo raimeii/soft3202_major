@@ -1,9 +1,20 @@
 package major_project.model;
 
+import major_project.model.Database.Database;
+import major_project.model.Database.OfflineDatabaseImpl;
+import major_project.model.Database.OnlineDatabaseImpl;
+import major_project.model.GuardianHandler.GuardianHandler;
+import major_project.model.GuardianHandler.OfflineGuardianHandlerImpl;
+import major_project.model.GuardianHandler.OnlineGuardianHandlerImpl;
+import major_project.model.PastebinHandler.OfflinePastebinHandlerImpl;
+import major_project.model.PastebinHandler.PastebinHandler;
+import major_project.model.PastebinHandler.OnlinePastebinHandlerImpl;
+import major_project.model.ResourceHandler.ResourceHandler;
+import major_project.model.ResourceHandler.ResourceHandlerImpl;
+
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class AppModelImpl implements AppModel {
     /**
@@ -14,7 +25,13 @@ public class AppModelImpl implements AppModel {
     /**
      * PastebinHandler in charge of API calls to pastebin API
      */
-    private final PastebinHandler pastebinHandler = new PastebinHandlerImpl();
+    private final PastebinHandler pastebinHandler;
+
+    /**
+     * Resource handler in charge of setting up the music resource
+     */
+
+    private final ResourceHandler resourceHandler = new ResourceHandlerImpl();
 
     /**
      * status of input api
@@ -58,13 +75,21 @@ public class AppModelImpl implements AppModel {
         this.outputOnline = outputOnline;
 
         if (inputOnline) {
-            database = new DatabaseImpl();
+            database = new OnlineDatabaseImpl();
             database.createDatabase();
             database.setupDatabase();
+            guardianHandler = new OnlineGuardianHandlerImpl(database);
+
         } else {
-            database = null;
+            database = new OfflineDatabaseImpl();
+            guardianHandler = new OfflineGuardianHandlerImpl();
         }
-        guardianHandler = new GuardianHandlerImpl(database);
+
+        if (outputOnline) {
+            pastebinHandler = new OnlinePastebinHandlerImpl();
+        } else {
+            pastebinHandler = new OfflinePastebinHandlerImpl();
+        }
     }
 
 
@@ -90,56 +115,35 @@ public class AppModelImpl implements AppModel {
     @Override
     public ArrayList<String> searchMatchingTags(String input) {
         //basically return the list of ResultsPOJO's id tag, use web-title link
-        if (inputOnline) {
-            try {
-                return guardianHandler.getMatchingTags(input);
-            } catch (InvalidParameterException e){
-                return new ArrayList<>();
-            }
-
-        } else {
-            return new ArrayList<>(List.of("testTag1" , "testTag2", "testTag3"));
+        try {
+            return guardianHandler.getMatchingTags(input);
+        } catch (InvalidParameterException e){
+            return new ArrayList<>();
         }
     }
     //database search
     @Override
     public ArrayList<String> getResultsWithTagAPI(String tag) {
-        //use q link
-        if (inputOnline) {
-            try {
-                return guardianHandler.getResultsWithTagAPI(tag);
-            } catch (InvalidParameterException | IllegalStateException e) {
-                return new ArrayList<>();
-            }
-        } else {
-            return new ArrayList<>(List.of("testResult1" , "testResult2", "testResult3", "testResult4"));
+        try {
+            return guardianHandler.getResultsWithTagAPI(tag);
+        } catch (InvalidParameterException e) {
+            return new ArrayList<>();
         }
     }
     @Override
     public ArrayList<String> getResultsWithTagDB(String tag) {
-        //use q link
-        if (inputOnline) {
-            try {
-                return guardianHandler.getResultsWithTagDB(tag);
-            } catch (InvalidParameterException | IllegalStateException e) {
-                return new ArrayList<>();
-            }
-
-        } else {
-            return new ArrayList<>(List.of("testResult1" , "testResult2", "testResult3", "testResult4"));
+        try {
+            return guardianHandler.getResultsWithTagDB(tag);
+        } catch (InvalidParameterException e) {
+            return new ArrayList<>();
         }
     }
     @Override
     public String getContentURL(String title) {
-        if (inputOnline) {
-            try {
-                return guardianHandler.getURL(title);
-            } catch (InvalidParameterException e) {
-                return "";
-            }
-
-        } else {
-            return "https://youtu.be/dQw4w9WgXcQ";
+        try {
+            return guardianHandler.getURL(title);
+        } catch (InvalidParameterException e) {
+            return "";
         }
     }
     @Override
@@ -162,16 +166,12 @@ public class AppModelImpl implements AppModel {
     }
     @Override
     public String generateOutputReport() {
-        if (outputOnline) {
-            if (tagMatches == null || resultMatches == null || currentTag == null) {
-                return "";
-            }
-            try {
-                return pastebinHandler.generateOutputReport(buildOutputReport());
-            } catch (InvalidParameterException e)  {
-                return "";
-            }
-        } else {
+        if (tagMatches == null || resultMatches == null || currentTag == null) {
+            return "";
+        }
+        try {
+            return pastebinHandler.generateOutputReport(buildOutputReport());
+        } catch (InvalidParameterException e)  {
             return "";
         }
     }
@@ -197,23 +197,22 @@ public class AppModelImpl implements AppModel {
     public void setResultMatches(List<String> resultMatches) {
         this.resultMatches = resultMatches;
     }
+
     @Override
     public String getMusicResource() {
-        try {
-            return Objects.requireNonNull(getClass().getClassLoader().getResource("amelia_watson_bgm.mp3")).toString();
-        } catch (NullPointerException e) {
-            return null;
-        }
-
+        return resourceHandler.getMusicResource();
     }
+
     @Override
     public boolean isAudioPlaying() {
-        return audioPlaying;
+        return resourceHandler.isAudioPlaying();
     }
+
     @Override
     public void setAudioPlaying(boolean audioPlaying) {
-        this.audioPlaying = audioPlaying;
+        resourceHandler.setAudioPlaying(audioPlaying);
     }
+
     @Override
     public GuardianHandler getGuardianHandler() {
         return guardianHandler;

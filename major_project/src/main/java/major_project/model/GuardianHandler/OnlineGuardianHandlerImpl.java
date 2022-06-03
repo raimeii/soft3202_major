@@ -1,6 +1,9 @@
-package major_project.model;
+package major_project.model.GuardianHandler;
 
 import com.google.gson.Gson;
+import major_project.model.Database.Database;
+import major_project.model.POJOS.GuardianPOJO;
+import major_project.model.POJOS.ResultsPOJO;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class GuardianHandlerImpl implements GuardianHandler {
+public class OnlineGuardianHandlerImpl implements GuardianHandler {
     //handles HTTP/mocked calls to the Guardian API
     /**
      * GuardianPOJO object containing the last response from the theguardian API
@@ -30,7 +33,7 @@ public class GuardianHandlerImpl implements GuardianHandler {
      */
     List<ResultsPOJO> tagResults;
 
-    public GuardianHandlerImpl(Database d) {
+    public OnlineGuardianHandlerImpl(Database d) {
         database = d;
     }
 
@@ -39,7 +42,6 @@ public class GuardianHandlerImpl implements GuardianHandler {
         if (tag == null) {
             throw new InvalidParameterException("Tag parameter is null");
         }
-        //citation for hellohttp
         try {
             String URIVariable = String.format("https://content.guardianapis.com/tags?web-title=%s&api-key=%s", tag, System.getenv("INPUT_API_KEY"));
             HttpRequest request = HttpRequest.newBuilder(new URI(URIVariable))
@@ -62,7 +64,6 @@ public class GuardianHandlerImpl implements GuardianHandler {
 
         } catch (IOException | InterruptedException e) {
             System.out.println("Something went wrong with our request!");
-            System.out.println(e.getMessage());
             return null;
         } catch (URISyntaxException ignored) {
             ;
@@ -72,12 +73,9 @@ public class GuardianHandlerImpl implements GuardianHandler {
     }
 
     @Override
-    public ArrayList<String> getResultsWithTagAPI(String tag) throws InvalidParameterException, IllegalStateException {
+    public ArrayList<String> getResultsWithTagAPI(String tag) throws InvalidParameterException {
         if (tag == null) {
             throw new InvalidParameterException("Tag parameter is null");
-        }
-        if (database == null) {
-            throw new IllegalStateException("Illegal state: calling API method when app is offline");
         }
         try {
             String URIVariable = String.format("https://content.guardianapis.com/search?tag=%s&api-key=%s", tag, System.getenv("INPUT_API_KEY"));
@@ -109,7 +107,6 @@ public class GuardianHandlerImpl implements GuardianHandler {
 
         } catch (IOException | InterruptedException e) {
             System.out.println("Something went wrong with our request!");
-            System.out.println(e.getMessage());
             return null;
         } catch (URISyntaxException ignored) {
             ;
@@ -122,11 +119,6 @@ public class GuardianHandlerImpl implements GuardianHandler {
         if (tag == null) {
             throw new InvalidParameterException("Tag parameter is null");
         }
-
-        if (database == null) {
-            throw new IllegalStateException("Illegal state: calling API method when app is offline");
-        }
-
         ArrayList<String> ret = new ArrayList<>();
         tagResults = database.retrieveResults(tag);
         for (ResultsPOJO result: tagResults) {

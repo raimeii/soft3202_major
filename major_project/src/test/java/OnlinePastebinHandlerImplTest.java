@@ -1,5 +1,5 @@
-import major_project.model.PastebinHandler;
-import major_project.model.PastebinHandlerImpl;
+import major_project.model.PastebinHandler.PastebinHandler;
+import major_project.model.PastebinHandler.OnlinePastebinHandlerImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -11,12 +11,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class PastebinHandlerImplTest {
+public class OnlinePastebinHandlerImplTest {
 
 
     @Test
     public void testNullToReport() {
-        PastebinHandler ph = new PastebinHandlerImpl();
+        PastebinHandler ph = new OnlinePastebinHandlerImpl();
         InvalidParameterException thrown = Assertions.assertThrows(InvalidParameterException.class, () -> {
             ph.generateOutputReport(null);
         });
@@ -26,7 +26,7 @@ public class PastebinHandlerImplTest {
 
     @Test
     public void mockedGenerateOutputReport() {
-        PastebinHandler ph = mock(PastebinHandlerImpl.class);
+        PastebinHandler ph = mock(OnlinePastebinHandlerImpl.class);
         String pastebinLink = "definitely a pastebin string";
         when(ph.generateOutputReport(anyString())).thenReturn(pastebinLink);
         assertEquals(ph.generateOutputReport("definitely the content you want"), pastebinLink);

@@ -1,6 +1,6 @@
-import major_project.model.Database;
-import major_project.model.DatabaseImpl;
-import major_project.model.ResultsPOJO;
+import major_project.model.Database.Database;
+import major_project.model.Database.OnlineDatabaseImpl;
+import major_project.model.POJOS.ResultsPOJO;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -12,11 +12,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class DatabaseImplTest {
+public class OnlineDatabaseImplTest {
 
     @Test
     public void mockCheckQueryTagExists() {
-        Database db = mock(DatabaseImpl.class);
+        Database db = mock(OnlineDatabaseImpl.class);
         when(db.queryCheckTagExists(anyString())).thenReturn(true);
         assertTrue(db.queryCheckTagExists("Any string"));
     }
@@ -24,7 +24,7 @@ public class DatabaseImplTest {
 
     @Test
     public void mockRetrieveResults() {
-        Database db = mock(DatabaseImpl.class);
+        Database db = mock(OnlineDatabaseImpl.class);
         List<ResultsPOJO> resultsMock = new ArrayList<>();
         ResultsPOJO r1 = new ResultsPOJO("a", "b", "c", "d");
         ResultsPOJO r2 = new ResultsPOJO("e", "f", "g", "h");

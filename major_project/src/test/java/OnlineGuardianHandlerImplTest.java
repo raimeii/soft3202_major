@@ -1,5 +1,5 @@
-import major_project.model.GuardianHandler;
-import major_project.model.GuardianHandlerImpl;
+import major_project.model.GuardianHandler.GuardianHandler;
+import major_project.model.GuardianHandler.OnlineGuardianHandlerImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -13,11 +13,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class GuardianHandlerImplTest {
+public class OnlineGuardianHandlerImplTest {
 
     @Test
     public void getMatchingTagsNull() {
-        GuardianHandler gh = new GuardianHandlerImpl(null);
+        GuardianHandler gh = new OnlineGuardianHandlerImpl(null);
 
         InvalidParameterException thrown = Assertions.assertThrows(InvalidParameterException.class, () -> {
             gh.getMatchingTags(null);
@@ -28,7 +28,7 @@ public class GuardianHandlerImplTest {
 
     @Test
     public void getMatchingTagsMocked() {
-        GuardianHandler gh = mock(GuardianHandlerImpl.class);
+        GuardianHandler gh = mock(OnlineGuardianHandlerImpl.class);
         when(gh.getMatchingTags(anyString())).thenReturn(new ArrayList<>(List.of("oneTag")));
         ArrayList<String> mockRes = gh.getMatchingTags("Zim zalabim");
         assertEquals(mockRes.size(), 1);
@@ -36,7 +36,7 @@ public class GuardianHandlerImplTest {
     }
     @Test
     public void getResultsWithTagNull() {
-        GuardianHandler gh = new GuardianHandlerImpl(null);
+        GuardianHandler gh = new OnlineGuardianHandlerImpl(null);
         InvalidParameterException thrown = Assertions.assertThrows(InvalidParameterException.class, () -> {
             gh.getResultsWithTagAPI(null);
         });
@@ -46,7 +46,7 @@ public class GuardianHandlerImplTest {
 
     @Test
     public void getResultsWithTagMocked() {
-        GuardianHandler gh = mock(GuardianHandlerImpl.class);
+        GuardianHandler gh = mock(OnlineGuardianHandlerImpl.class);
         when(gh.getResultsWithTagAPI(anyString())).thenReturn(new ArrayList<>(List.of("oneResult", "twoResult")));
         ArrayList<String> mockRes = gh.getResultsWithTagAPI("custom keyboards are really cool!");
         assertEquals(mockRes.size(), 2);
@@ -55,7 +55,7 @@ public class GuardianHandlerImplTest {
 
     @Test
     public void getURLNull() {
-        GuardianHandler gh = new GuardianHandlerImpl(null);
+        GuardianHandler gh = new OnlineGuardianHandlerImpl(null);
 
         InvalidParameterException thrown = Assertions.assertThrows(InvalidParameterException.class, () -> {
             gh.getURL(null);
@@ -66,15 +66,9 @@ public class GuardianHandlerImplTest {
 
     @Test
     public void getURLMocked() {
-        GuardianHandler gh = mock(GuardianHandlerImpl.class);
+        GuardianHandler gh = mock(OnlineGuardianHandlerImpl.class);
         String url = "this is definitely a url";
         when(gh.getURL(anyString())).thenReturn(url);
         assertEquals(gh.getURL("rick astley rickroll hehe"), url);
     }
-
-
-
-
-    //to test null database, need GuardianHandler getter from app model fixture
-
 }

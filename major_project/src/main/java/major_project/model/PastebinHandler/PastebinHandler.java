@@ -1,4 +1,4 @@
-package major_project.model;
+package major_project.model.PastebinHandler;
 
 public interface PastebinHandler {
 

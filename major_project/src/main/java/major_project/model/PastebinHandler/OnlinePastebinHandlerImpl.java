@@ -1,4 +1,4 @@
-package major_project.model;
+package major_project.model.PastebinHandler;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -17,7 +17,7 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PastebinHandlerImpl implements PastebinHandler {
+public class OnlinePastebinHandlerImpl implements PastebinHandler {
 
     @Override
     public String generateOutputReport(String toReport) throws InvalidParameterException {

@@ -1,8 +1,7 @@
-package major_project.model;
+package major_project.model.Database;
 
-import java.io.File;
-import java.sql.*;
-import java.util.ArrayList;
+import major_project.model.POJOS.ResultsPOJO;
+
 import java.util.List;
 
 public interface Database {

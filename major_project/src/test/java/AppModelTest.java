@@ -1,6 +1,6 @@
 import major_project.model.AppModel;
 import major_project.model.AppModelImpl;
-import major_project.model.GuardianHandler;
+import major_project.model.GuardianHandler.GuardianHandler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -112,31 +112,20 @@ public class AppModelTest {
         assertEquals("", fixture.generateOutputReport());
     }
 
-
+    /*all offline guardian handler logic is tested in any test that uses an offline API, so there is no test class for
+        it specifically
+    * */
     @Test
     public void callAPIWhenOffline() {
         fixture = new AppModelImpl(false, false);
         GuardianHandler gh = fixture.getGuardianHandler();
 
-        IllegalStateException thrown = Assertions.assertThrows(IllegalStateException.class, () -> gh.getResultsWithTagAPI("some string"));
-
-        assertEquals("Illegal state: calling API method when app is offline", thrown.getMessage());
-
-        IllegalStateException thrown2 = Assertions.assertThrows(IllegalStateException.class, () -> gh.getResultsWithTagDB("some string"));
-
-        assertEquals("Illegal state: calling API method when app is offline", thrown2.getMessage());
+        ArrayList<String> resultsWithTagAPI = gh.getResultsWithTagAPI("some string");
+        assertEquals(4, resultsWithTagAPI.size());
 
         ArrayList<String> resultsWithTagDB = fixture.getResultsWithTagDB("some tag");
         assertEquals(4, resultsWithTagDB.size());
 
         assertFalse(fixture.checkTagExistsInDatabase("doesnt matter"));
     }
-
-
-
-
-
-
-    //to test null database, need GuardianHandler getter from app model fixture
-
 }
