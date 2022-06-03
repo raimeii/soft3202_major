@@ -6,7 +6,7 @@ Credit Optional Feature 2: Theme music <br>
 
 Milestone 1 Submission: <br>
     SHA: 76f268e <br>
-    URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/76f268e4798478d79130721917653a176352f470#diff-d010c0645d9236cff2a125742604305aaa5ee379991f3b702b729f5717bad94c <br>
+    URI: https://github.sydney.edu.au/abur2581/SCD2_2022/tree/76f268e4798478d79130721917653a176352f470 <br>
 Milestone 1 Re-Submission: <br>
     SHA: 02f5b31 <br>
     URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/02f5b314b8ca1c01e30f8749f9675b4903ca5862 <br>
