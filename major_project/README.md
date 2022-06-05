@@ -1,8 +1,9 @@
 Input API: TheGuardian <br>
 Output API: Pastebin <br> 
-Claimed Tier: Credit <br>
+Claimed Tier: Distinction <br>
 Credit Optional Feature 1: Keyboard shortcuts and tabbing navigation <br>
 Credit Optional Feature 2: Theme music <br>
+Distinction Optional Feature: Progress Indicator for API calls
 
 Milestone 1 Submission: <br>
     SHA: 76f268e <br>
@@ -34,8 +35,12 @@ V for cache clear <br>
 
 Theme song that plays on a loop, with requisite play/pause button. <br>
 
+Distinction Extra Feature: <br>
+Progress indicator will spin with api call is initiated, and then turn to done with a check mark when the call is finished. <br>
+
 Citations: <br>
 Task 3 for inspiration for setting up GUI and keyboard shortcuts <br>
 HelloHTTP from the modules for most of the HTTP handling in both input/output handler classes. <br> 
 https://hc.apache.org/httpcomponents-client-5.1.x/quickstart.html# - Apache docs for setting up Apache HTTP client <br> 
 https://dova-s.jp/EN/bgm/play12459.html - おもちゃのダンス @ フリ BGM by DOVA-SYNDROME, renamed to amelia_watson_bgm.mp3 in ./src/main/resources <br>
+https://edencoding.com/resources/css_properties/fx-background-color/ - information on setting the background colour/colour effects <br>

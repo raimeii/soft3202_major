@@ -1,5 +1,5 @@
-import major_project.model.GuardianHandler.GuardianHandler;
-import major_project.model.GuardianHandler.OnlineGuardianHandlerImpl;
+import majorproject.model.guardianhandler.GuardianHandler;
+import majorproject.model.guardianhandler.OnlineGuardianHandlerImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ public class OnlineGuardianHandlerImplTest {
         assertEquals(mockRes.get(0), "oneTag");
     }
     @Test
-    public void getResultsWithTagNull() {
+    public void getResultsWithTagAPINull() {
         GuardianHandler gh = new OnlineGuardianHandlerImpl(null);
         InvalidParameterException thrown = Assertions.assertThrows(InvalidParameterException.class, () -> {
             gh.getResultsWithTagAPI(null);
@@ -45,12 +45,31 @@ public class OnlineGuardianHandlerImplTest {
     }
 
     @Test
-    public void getResultsWithTagMocked() {
+    public void getResultsWithTagAPIMocked() {
         GuardianHandler gh = mock(OnlineGuardianHandlerImpl.class);
         when(gh.getResultsWithTagAPI(anyString())).thenReturn(new ArrayList<>(List.of("oneResult", "twoResult")));
         ArrayList<String> mockRes = gh.getResultsWithTagAPI("custom keyboards are really cool!");
         assertEquals(mockRes.size(), 2);
         assertEquals(mockRes.get(1), "twoResult");
+    }
+
+    @Test
+    public void getResultsWithTagDBNull() {
+        GuardianHandler gh = new OnlineGuardianHandlerImpl(null);
+        InvalidParameterException thrown = Assertions.assertThrows(InvalidParameterException.class, () -> {
+            gh.getResultsWithTagDB(null);
+        });
+
+        assertEquals("Tag parameter is null", thrown.getMessage());
+    }
+
+    @Test
+    public void getResultsWithTagDBMocked() {
+        GuardianHandler gh = mock(OnlineGuardianHandlerImpl.class);
+        when(gh.getResultsWithTagAPI(anyString())).thenReturn(new ArrayList<>(List.of("oneResult", "twoResult", "threeResult", "4")));
+        ArrayList<String> mockRes = gh.getResultsWithTagDB("custom keyboards are really cool! and really expensive :(");
+        assertEquals(mockRes.size(), 2);
+        assertEquals(mockRes.get(3), "4");
     }
 
     @Test

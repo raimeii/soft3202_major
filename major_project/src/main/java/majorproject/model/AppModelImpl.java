@@ -1,16 +1,16 @@
-package major_project.model;
+package majorproject.model;
 
-import major_project.model.Database.Database;
-import major_project.model.Database.OfflineDatabaseImpl;
-import major_project.model.Database.OnlineDatabaseImpl;
-import major_project.model.GuardianHandler.GuardianHandler;
-import major_project.model.GuardianHandler.OfflineGuardianHandlerImpl;
-import major_project.model.GuardianHandler.OnlineGuardianHandlerImpl;
-import major_project.model.PastebinHandler.OfflinePastebinHandlerImpl;
-import major_project.model.PastebinHandler.PastebinHandler;
-import major_project.model.PastebinHandler.OnlinePastebinHandlerImpl;
-import major_project.model.ResourceHandler.ResourceHandler;
-import major_project.model.ResourceHandler.ResourceHandlerImpl;
+import majorproject.model.database.Database;
+import majorproject.model.database.OfflineDatabaseImpl;
+import majorproject.model.database.OnlineDatabaseImpl;
+import majorproject.model.guardianhandler.GuardianHandler;
+import majorproject.model.guardianhandler.OfflineGuardianHandlerImpl;
+import majorproject.model.guardianhandler.OnlineGuardianHandlerImpl;
+import majorproject.model.pastebinhandler.OfflinePastebinHandlerImpl;
+import majorproject.model.pastebinhandler.PastebinHandler;
+import majorproject.model.pastebinhandler.OnlinePastebinHandlerImpl;
+import majorproject.model.resourcehandler.ResourceHandler;
+import majorproject.model.resourcehandler.ResourceHandlerImpl;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;

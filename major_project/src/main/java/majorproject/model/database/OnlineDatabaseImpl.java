@@ -1,12 +1,16 @@
-package major_project.model.Database;
+package majorproject.model.database;
 
-import major_project.model.POJOS.ResultsPOJO;
+import majorproject.model.pojos.ResultsPOJO;
 
 import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Online implementation of the Database interface that uses SQLite to manage the local database file
+ */
 public class OnlineDatabaseImpl implements Database {
 
     /**

@@ -1,27 +1,22 @@
-package major_project.view;
+package majorproject.view;
 
 
 import javafx.application.HostServices;
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.media.*;
 import javafx.scene.layout.BorderPane;
 
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
-import major_project.model.AppModel;
-import major_project.model.AppModelImpl;
+import majorproject.model.AppModel;
 
-import java.util.Optional;
-
-import static javafx.scene.input.KeyCode.ENTER;
-
-
+/**
+ * The main view class, which collects all the elements of the different parts of the view. Called by the main method to
+ * be displayed.
+ */
 public class AppWindow {
 
     private final Scene scene;
@@ -51,7 +46,7 @@ public class AppWindow {
         VBox vb = inputView.buildInputView();
         vb.setSpacing(10);
 
-        Button generateReportBtn = outputView.createReportGeneration();
+        HBox generateReportHBox = outputView.createReportGeneration();
 
         Button mediaControlBtn = mediaHandler.createPlayPauseButton();
 
@@ -61,7 +56,7 @@ public class AppWindow {
 
         pane.setCenter(vb);
 
-        HBox bottomBox = new HBox(generateReportBtn, mediaControlBtn, clearCacheBtn);
+        HBox bottomBox = new HBox(generateReportHBox, mediaControlBtn, clearCacheBtn);
         bottomBox.setSpacing(10);
         pane.setBottom(bottomBox);
         buildKeyListeners();
@@ -71,12 +66,10 @@ public class AppWindow {
     }
 
 
+    /**
+     * Setup of key listeners to execute events for the app.
+     */
     private void buildKeyListeners() {
-        // This allows keyboard input. Note that the scene is used, so any time
-        // the window is in focus the keyboard input will be registered.
-        // More often, keyboard input is more closely linked to a specific
-        // node that must have focus, i.e. the Enter key in a text input to submit
-        // a form.
 
         scene.addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) -> {
             if (event.isControlDown() && event.getCode() == KeyCode.L) {

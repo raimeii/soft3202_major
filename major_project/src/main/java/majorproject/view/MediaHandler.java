@@ -1,10 +1,14 @@
-package major_project.view;
+package majorproject.view;
 
 import javafx.scene.control.Button;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import major_project.model.AppModel;
+import majorproject.model.AppModel;
+
+/**
+ * Handles the UI elements and their event handlers for the media button
+ */
 
 public class MediaHandler {
 

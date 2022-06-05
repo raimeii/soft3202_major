@@ -1,4 +1,4 @@
-package major_project.model.ResourceHandler;
+package majorproject.model.resourcehandler;
 
 import java.util.Objects;
 

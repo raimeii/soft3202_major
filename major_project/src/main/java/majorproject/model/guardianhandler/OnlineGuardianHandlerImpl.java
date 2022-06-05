@@ -1,9 +1,9 @@
-package major_project.model.GuardianHandler;
+package majorproject.model.guardianhandler;
 
 import com.google.gson.Gson;
-import major_project.model.Database.Database;
-import major_project.model.POJOS.GuardianPOJO;
-import major_project.model.POJOS.ResultsPOJO;
+import majorproject.model.database.Database;
+import majorproject.model.pojos.GuardianPOJO;
+import majorproject.model.pojos.ResultsPOJO;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,8 +16,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Online implementation of the GuardianHandler interface, makes API calls to retrieve information
+ */
 public class OnlineGuardianHandlerImpl implements GuardianHandler {
-    //handles HTTP/mocked calls to the Guardian API
     /**
      * GuardianPOJO object containing the last response from the theguardian API
      */

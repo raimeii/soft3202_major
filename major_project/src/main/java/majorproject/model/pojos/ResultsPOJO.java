@@ -1,4 +1,4 @@
-package major_project.model.POJOS;
+package majorproject.model.pojos;
 
 public class ResultsPOJO {
 

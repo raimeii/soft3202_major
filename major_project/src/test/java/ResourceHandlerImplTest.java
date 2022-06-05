@@ -1,5 +1,5 @@
-import major_project.model.ResourceHandler.ResourceHandler;
-import major_project.model.ResourceHandler.ResourceHandlerImpl;
+import majorproject.model.resourcehandler.ResourceHandler;
+import majorproject.model.resourcehandler.ResourceHandlerImpl;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

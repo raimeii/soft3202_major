@@ -1,12 +1,15 @@
-package major_project.view;
+package majorproject.view;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import major_project.model.AppModel;
+import majorproject.model.AppModel;
 
 import java.util.Optional;
 
+/**
+ * Handles the UI elements and their event handlers for the cache
+ */
 public class CacheHandler {
 
     private final AppModel model;

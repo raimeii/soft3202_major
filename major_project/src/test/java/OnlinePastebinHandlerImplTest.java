@@ -1,5 +1,5 @@
-import major_project.model.PastebinHandler.PastebinHandler;
-import major_project.model.PastebinHandler.OnlinePastebinHandlerImpl;
+import majorproject.model.pastebinhandler.PastebinHandler;
+import majorproject.model.pastebinhandler.OnlinePastebinHandlerImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

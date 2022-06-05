@@ -1,10 +1,15 @@
-package major_project.model.Database;
+package majorproject.model.database;
 
-import major_project.model.POJOS.ResultsPOJO;
+import majorproject.model.pojos.ResultsPOJO;
 
 import java.util.List;
 
-public class OfflineDatabaseImpl implements Database {
+
+/**
+ * Offline implementation, no logic in methods that return void, return null/false otherwise
+ */
+public class OfflineDatabaseImpl implements Database {//handles HTTP/mocked calls to the Guardian API
+
     @Override
     public void createDatabase() {
 
@@ -32,7 +37,7 @@ public class OfflineDatabaseImpl implements Database {
 
     @Override
     public boolean queryCheckTagExists(String tag) {
-        return true;
+        return false;
     }
 
     @Override

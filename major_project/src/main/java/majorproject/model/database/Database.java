@@ -1,6 +1,6 @@
-package major_project.model.Database;
+package majorproject.model.database;
 
-import major_project.model.POJOS.ResultsPOJO;
+import majorproject.model.pojos.ResultsPOJO;
 
 import java.util.List;
 

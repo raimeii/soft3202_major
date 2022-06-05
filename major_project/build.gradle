@@ -32,7 +32,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'major_project.Main'
+    mainClass = 'majorproject.Main'
 }
 
 tasks.named('test') {

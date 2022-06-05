@@ -1,8 +1,7 @@
-import major_project.model.AppModel;
-import major_project.model.AppModelImpl;
-import major_project.model.GuardianHandler.GuardianHandler;
+import majorproject.model.AppModel;
+import majorproject.model.AppModelImpl;
+import majorproject.model.guardianhandler.GuardianHandler;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

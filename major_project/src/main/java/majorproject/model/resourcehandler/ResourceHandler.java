@@ -1,5 +1,9 @@
-package major_project.model.ResourceHandler;
+package majorproject.model.resourcehandler;
 
+
+/**
+ * Simple resource handling to move the play/pause logic outside the view
+ */
 public interface ResourceHandler {
 
     /**

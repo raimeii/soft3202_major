@@ -1,10 +1,10 @@
-package major_project;
+package majorproject;
 import javafx.application.Application;
 import javafx.application.HostServices;
 import javafx.stage.Stage;
-import major_project.model.AppModel;
-import major_project.model.AppModelImpl;
-import major_project.view.AppWindow;
+import majorproject.model.AppModel;
+import majorproject.model.AppModelImpl;
+import majorproject.view.AppWindow;
 import java.util.List;
 
 public class Main extends Application {

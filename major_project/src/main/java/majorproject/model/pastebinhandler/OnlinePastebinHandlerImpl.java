@@ -1,4 +1,4 @@
-package major_project.model.PastebinHandler;
+package majorproject.model.pastebinhandler;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -17,6 +17,10 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Online implementation of the PastebinHandkler interface, makes api calls to dump the application output to a pastebin
+ * page
+ */
 public class OnlinePastebinHandlerImpl implements PastebinHandler {
 
     @Override
@@ -40,7 +44,6 @@ public class OnlinePastebinHandlerImpl implements PastebinHandler {
                 String link = new String(body.readAllBytes(), StandardCharsets.UTF_8);
                 // and ensure it is fully consumed
                 EntityUtils.consume(entity);
-
                 return link;
             }
         } catch (IOException e) {

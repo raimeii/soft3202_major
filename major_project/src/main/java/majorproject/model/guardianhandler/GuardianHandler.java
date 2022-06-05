@@ -1,5 +1,5 @@
-package major_project.model.GuardianHandler;
-import major_project.model.POJOS.GuardianPOJO;
+package majorproject.model.guardianhandler;
+import majorproject.model.pojos.GuardianPOJO;
 
 import java.util.ArrayList;
 
@@ -17,7 +17,7 @@ public interface GuardianHandler {
     /**
      * Makes a get request to the TheGuardian API to retrieve the first 10 results with the tag specified. The return
      * response is a GuardianPOJO, then the handler's tagResults list of ResultsPOJOS is set to
-     * GuardianPOJO.returnResponse().getResults(). Afterwards, checks if the tag is cached in the cache, and caches the
+     * the returned response's results. Afterwards, checks if the tag is cached in the cache, and caches the
      * tag and results if it does not. Finally, collects the string representation  of the tagResults list, sorts
      * alphabetically, and returns it as an array list of strings.
      *

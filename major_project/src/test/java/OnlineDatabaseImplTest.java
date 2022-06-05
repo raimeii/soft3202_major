@@ -1,6 +1,6 @@
-import major_project.model.Database.Database;
-import major_project.model.Database.OnlineDatabaseImpl;
-import major_project.model.POJOS.ResultsPOJO;
+import majorproject.model.database.Database;
+import majorproject.model.database.OnlineDatabaseImpl;
+import majorproject.model.pojos.ResultsPOJO;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

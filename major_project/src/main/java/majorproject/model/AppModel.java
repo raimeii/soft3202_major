@@ -1,6 +1,6 @@
-package major_project.model;
+package majorproject.model;
 
-import major_project.model.GuardianHandler.GuardianHandler;
+import majorproject.model.guardianhandler.GuardianHandler;
 
 import java.util.ArrayList;
 import java.util.List;
