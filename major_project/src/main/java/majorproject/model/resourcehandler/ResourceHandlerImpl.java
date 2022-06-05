@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class ResourceHandlerImpl implements ResourceHandler {
 
-    boolean audioPlaying = true;
+    private boolean audioPlaying = true;
 
     @Override
     public String getMusicResource() {

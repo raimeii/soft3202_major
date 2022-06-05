@@ -54,11 +54,6 @@ public class AppModelImpl implements AppModel {
     private List<String> resultMatches;
 
     /**
-     * state of audio (playing/paused)
-     */
-    private boolean audioPlaying = true;
-
-    /**
      * Database handler to process SQL calls when caching
      */
     private final Database database;
