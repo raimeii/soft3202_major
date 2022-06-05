@@ -44,7 +44,7 @@ public class AppWindow {
         this.mediaHandler = new MediaHandler(model);
         this.cacheHandler = new CacheHandler(model);
         BorderPane pane = new BorderPane();
-        pane.setStyle("-fx-background-color: linear-gradient(#61b5fa, #ffffff)");
+        pane.setStyle("-fx-background-color: white, linear-gradient(#61b5fa, #ffffff)");
         this.scene = new Scene(pane);
 
 

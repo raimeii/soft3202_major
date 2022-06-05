@@ -2,12 +2,15 @@ package major_project.view;
 
 import javafx.application.HostServices;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import major_project.model.AppModel;
-
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static javafx.scene.input.KeyCode.ENTER;
 
@@ -21,9 +24,18 @@ public class InputView {
     private ListView<String> tagOutputField;
     private final Label currentTagLabel = new Label("Articles with tag: ");;
     private ListView<String> resultOutputField;
-
     private AppModel model;
     private final HostServices hostService;
+
+    /*private Task<ObservableList<String>> lookupTaskAPI;
+
+    private Task<ObservableList<String>> outputTaskAPI;
+
+    private final ExecutorService Executor = Executors.newFixedThreadPool(2, runnable -> {
+        Thread t = new Thread(runnable);
+        t.setDaemon(true);
+        return t;
+    });*/
 
     public InputView (AppModel model, HostServices hostService) {
         this.model = model;
@@ -141,7 +153,7 @@ public class InputView {
     private void tagOutputProcessing() {
         String tag = tagOutputField.getSelectionModel().getSelectedItem();
         model.setCurrentTag(tag);
-        this.currentTagLabel.setText("Articles with tag: " + model.getCurrentTag());
+        currentTagLabel.setText("Articles with tag: " + model.getCurrentTag());
         if (model.checkTagExistsInDatabase(tag)) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Tag found in database");
@@ -156,7 +168,7 @@ public class InputView {
         } else {
             model.setResultMatches(model.getResultsWithTagAPI(tag));
         }
-        this.resultOutputField.setItems(FXCollections.observableList(model.getResultMatches()));
+        resultOutputField.setItems(FXCollections.observableList(model.getResultMatches()));
     }
 
     private void resultDisplayProcessing() {
