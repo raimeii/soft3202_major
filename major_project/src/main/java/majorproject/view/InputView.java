@@ -151,7 +151,6 @@ public class InputView {
 
     public void lookUp() {
         lookupTaskAPI = new Task<>() {
-
             @Override
             protected Void call() throws Exception {
 
@@ -198,27 +197,21 @@ public class InputView {
             tagOutputAPICall(tag);
         }
     }
-
     private void tagOutputAPICall(String tag) {
         tagOutputTask = new Task<>() {
-
             @Override
             protected ArrayList<String> call() throws Exception {
-
                 ArrayList<String> ret = model.getResultsWithTagAPI(tag);
                 Platform.runLater(() -> {
                     model.setResultMatches(ret);
                     resultOutputField.setItems(FXCollections.observableList(ret));
                     progressIndicator.setProgress(1);
-
                 });
                 return ret;
             }
         };
-
         executor.execute(tagOutputTask);
         progressIndicator.setProgress(lookupTaskAPI.getProgress());
-
     }
 
 

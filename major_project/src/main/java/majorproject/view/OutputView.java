@@ -44,7 +44,6 @@ public class OutputView {
 
     public void generateReport() {
         outputTask = new Task<>() {
-
             @Override
             protected Void call() throws Exception {
                 String pastebinURL = model.generateOutputReport();
@@ -55,7 +54,6 @@ public class OutputView {
                         textInput.setHeaderText("Pastebin of contents with tag: " + model.getCurrentTag());
                         progressIndicator.setProgress(1);
                         textInput.showAndWait();
-
                     }
                 });
                 return null;

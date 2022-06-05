@@ -1,8 +1,6 @@
 package majorproject.model.pojos;
 
 public class ResultsPOJO {
-
-
     /**
      * tag of the article
      */
