@@ -225,13 +225,22 @@ public class AppModelImpl implements AppModel {
     }
 
     @Override
-    public void addToSavedArticles(String title) {
-        guardianHandler.addToSaved(title);
+    public void addToSavedArticles(String title) throws InvalidParameterException {
+        try {
+            guardianHandler.addToSaved(title);
+        } catch (InvalidParameterException e) {
+            throw new InvalidParameterException("Null title");
+        }
+
     }
 
     @Override
-    public void removeFromSavedArticles(String title) {
-        guardianHandler.removeFromSaved(title);
+    public void removeFromSavedArticles(String title) throws InvalidParameterException {
+        try {
+            guardianHandler.removeFromSaved(title);
+        } catch (InvalidParameterException e) {
+            throw new InvalidParameterException("Null title");
+        }
     }
 
     @Override

@@ -87,6 +87,14 @@ public class AppWindow {
             if (event.isControlDown() && event.getCode() == KeyCode.V) {
                 cacheHandler.cacheClear();
             }
+
+            //exam implementation
+            if (event.isControlDown() && event.getCode() == KeyCode.J) {
+                inputView.addToSaved();
+            }
+            if (event.isControlDown() && event.getCode() == KeyCode.K) {
+                inputView.removeFromSaved();
+            }
         });
     }
 

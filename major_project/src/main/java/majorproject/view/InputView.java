@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import majorproject.model.AppModel;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,40 +70,7 @@ public class InputView {
         unsaveArticleButton = createUnsaveArticleButton();
     }
 
-    private Button createUnsaveArticleButton() {
-        Button unsaveButton = new Button("Delete from saved list");
-        unsaveButton.setOnAction((event -> {
-            ;
-        }));
-        return unsaveButton;
-    }
 
-    private Button createSaveArticleButton() {
-        Button saveButton = new Button("Add to saved list");
-        saveButton.setOnAction((event -> {
-            ;
-        }));
-        return saveButton;
-    }
-
-    private ListView<String> createSavedArticleField() {
-        ListView<String> savedArticleField = new ListView<>();
-        savedArticleField.setPrefWidth(600);
-        savedArticleField.setPrefHeight(250);
-        //set current tag to whatever is clicked
-        savedArticleField.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                ;
-            }
-        });
-
-        savedArticleField.setOnKeyPressed(event -> {
-            if (event.getCode() == ENTER) {
-                ;
-            }
-        });
-        return savedArticleField;
-    }
 
 
     public VBox buildInputView() {
@@ -240,6 +208,9 @@ public class InputView {
 
 
     private void tagOutputProcessing() {
+        if (lookupTaskAPI == null) {
+            return;
+        }
         String tag = tagOutputField.getSelectionModel().getSelectedItem();
         model.setCurrentTag(tag);
 
@@ -281,6 +252,75 @@ public class InputView {
     private void resultDisplayProcessing() {
         String title = resultOutputField.getSelectionModel().getSelectedItem();
         String url = model.getContentURL(title);
+        hostService.showDocument(url);
+    }
+
+    //exam implementation
+
+    private Button createUnsaveArticleButton() {
+        Button unsaveButton = new Button("Delete from saved list");
+        unsaveButton.setOnAction((event -> {
+            removeFromSaved();
+        }));
+        return unsaveButton;
+    }
+
+    private Button createSaveArticleButton() {
+        Button saveButton = new Button("Add to saved list");
+        saveButton.setOnAction((event -> {
+            addToSaved();
+        }));
+        return saveButton;
+    }
+
+    private ListView<String> createSavedArticleField() {
+        ListView<String> savedArticleField = new ListView<>();
+        savedArticleField.setPrefWidth(600);
+        savedArticleField.setPrefHeight(250);
+        //set current tag to whatever is clicked
+        savedArticleField.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                savedResultDisplayProcessing();
+            }
+        });
+
+        savedArticleField.setOnKeyPressed(event -> {
+            if (event.getCode() == ENTER) {
+                savedResultDisplayProcessing();
+            }
+        });
+        return savedArticleField;
+    }
+
+    private void clearAndUpdateSaved() {
+        savedArticleField.getItems().clear();
+        savedArticleField.setItems(FXCollections.observableList(model.getSavedArticles()));
+    }
+
+    public void addToSaved() {
+        try {
+            String title = resultOutputField.getSelectionModel().getSelectedItem();
+            model.addToSavedArticles(title);
+            clearAndUpdateSaved();
+        } catch (InvalidParameterException ignored) {
+            ;
+        }
+
+    }
+
+    public void removeFromSaved() {
+        try {
+            String title = savedArticleField.getSelectionModel().getSelectedItem();
+            model.removeFromSavedArticles(title);
+            clearAndUpdateSaved();
+        } catch (InvalidParameterException ignored) {
+            ;
+        }
+    }
+
+    private void savedResultDisplayProcessing() {
+        String title = savedArticleField.getSelectionModel().getSelectedItem();
+        String url = model.getSavedArticleURL(title);
         hostService.showDocument(url);
     }
 }
