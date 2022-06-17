@@ -53,6 +53,6 @@ public class OfflineGuardianHandlerImpl implements GuardianHandler{
 
     @Override
     public ArrayList<String> getResultsFromSaved() {
-        return new ArrayList<>(List.of("a" , "b", "c", "d" , "1", "2", "3"));
+        return new ArrayList<>(List.of("a", "b", "c", "d" , "1", "2", "3"));
     }
 }

@@ -148,7 +148,7 @@ public class InputView {
         ListView<String> resultOutputField = new ListView<>();
         resultOutputField.setPrefWidth(600);
         resultOutputField.setPrefHeight(250);
-        //set current tag to whatever is clicked
+        //modified in exam - only open the article when double-clicked
         resultOutputField.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 resultDisplayProcessing();
