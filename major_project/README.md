@@ -21,8 +21,8 @@ Exam Base Commit: <br>
     SHA: cdb6f14 <br>
     URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/cdb6f14f71df25b1262063855cab5208e480b0cf <br>
 Exam Submission Commit: <br>
-    SHA: <> <br>
-    URI: <> <br>
+    SHA: 17bf401 <br>
+    URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/17bf4012337573ee043beee03f4367ccb9be19e6 <br>
 
 Credit Extra Features:<br>
 Ability to toggle between elements using Tab, arrow keys to navigate list views and enter to select current selection. <br>
