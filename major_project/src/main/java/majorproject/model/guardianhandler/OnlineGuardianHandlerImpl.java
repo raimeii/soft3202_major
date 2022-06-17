@@ -35,6 +35,9 @@ public class OnlineGuardianHandlerImpl implements GuardianHandler {
      */
     private List<ResultsPOJO> tagResults;
 
+    /**
+     * List of ResultsPOJOs of user saved results
+     */
     private final List<ResultsPOJO> savedResults = new ArrayList<>();
 
     public OnlineGuardianHandlerImpl(Database d) {

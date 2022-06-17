@@ -47,7 +47,7 @@ public class InputView {
     });
 
     //Exam addition
-    Label savedArticleLabel = new Label("Your currently saved articles:");
+    private Label savedArticleLabel = new Label("Your currently saved articles:");
     private ListView<String> savedArticleField;
 
     private Button saveArticleButton;
@@ -68,8 +68,6 @@ public class InputView {
         saveArticleButton = createSaveArticleButton();
         unsaveArticleButton = createUnsaveArticleButton();
     }
-
-
 
 
     public VBox buildInputView() {
