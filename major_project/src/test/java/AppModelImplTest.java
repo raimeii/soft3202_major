@@ -13,7 +13,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AppModelTest {
+public class AppModelImplTest {
 
     private AppModel fixture;
 
@@ -96,7 +96,6 @@ public class AppModelTest {
 
     }
 
-
     @Test
     public void generateOutputReportTestOffline() {
         fixture = new AppModelImpl(false, false);
@@ -126,5 +125,56 @@ public class AppModelTest {
         assertEquals(4, resultsWithTagDB.size());
 
         assertFalse(fixture.checkTagExistsInDatabase("doesnt matter"));
+    }
+
+    //exam tests for new implementation
+
+    /**
+     * Simple tests that check if the offline api is working, simultaneously tests the functionality of the offline
+     * guardian handler
+     */
+    @Test
+    public void savedListTestsOffline() {
+        fixture = new AppModelImpl(false, false);
+        String mockURL = fixture.getSavedArticleURL("Doesnt really matter");
+        assertEquals(mockURL, "https://youtu.be/FvOpPeKSf_4");
+        assertFalse(fixture.addToSavedArticles("whatever"));
+        assertFalse(fixture.removeFromSavedArticles("whenever"));
+        assertEquals(7, fixture.getSavedArticles().size());
+    }
+
+
+    /**
+     * Mocked tests for the newly added methods for the exam extension since the "saved articles" rely on there being
+     * searched articles, which are obtained from an API call
+     */
+    @Test
+    public void getURLFromSavedOnlineMocked() {
+        fixture = mock(AppModelImpl.class);
+        String mock = "this is definitely a url";
+        when(fixture.getSavedArticleURL(anyString())).thenReturn(mock);
+        assertEquals(mock, fixture.getSavedArticleURL("Ducky momo"));
+    }
+
+
+    @Test
+    public void addToSavedOnlineMocked() {
+        fixture = mock(AppModelImpl.class);
+        when(fixture.addToSavedArticles(anyString())).thenReturn(true);
+        assertTrue(fixture.addToSavedArticles("Bingbong"));
+    }
+
+    @Test
+    public void removeFromSavedOnlineMocked() {
+        fixture = mock(AppModelImpl.class);
+        when(fixture.removeFromSavedArticles(anyString())).thenReturn(true);
+        assertTrue(fixture.removeFromSavedArticles("Dingdong"));
+    }
+
+    @Test
+    public void getResultsFromSavedOnlineMocked() {
+        fixture = mock(AppModelImpl.class);
+        when(fixture.getSavedArticles()).thenReturn(new ArrayList<>(List.of("oneSaved", "twoSaved", "threeSaved")));
+        assertEquals(3, fixture.getSavedArticles().size());
     }
 }

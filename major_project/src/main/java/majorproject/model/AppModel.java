@@ -149,11 +149,32 @@ public interface AppModel {
 
 
     //exam new features
+
+    /**
+     * retrieves the saved article's url with the relevant title from the list of saved articles
+     * @param title article title to search by
+     * @return the url of the corresponding article
+     */
     String getSavedArticleURL(String title);
 
-    void addToSavedArticles(String title);
+    /**
+     * adds to the saved article list an article from the current article-with-tag search with the given title
+     * @param title title of the article to add
+     * @return true if the operation is successful, false otherwise or if parameter is null
+     */
+    boolean addToSavedArticles(String title);
 
-    void removeFromSavedArticles(String title);
+    /**
+     * removes from the saved article list an article with the same title as parameter
+     * @param title title of the article to remove
+     * @return true if the operation is successful, false otherwise or if parameter is null
+     */
+    boolean removeFromSavedArticles(String title);
 
+
+    /**
+     * Returns a string list of all the article titles from the saved articles list
+     * @return string list of saved article titles
+     */
     ArrayList<String> getSavedArticles();
 }

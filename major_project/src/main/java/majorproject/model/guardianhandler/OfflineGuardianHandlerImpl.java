@@ -42,13 +42,13 @@ public class OfflineGuardianHandlerImpl implements GuardianHandler{
     }
 
     @Override
-    public void addToSaved(String title) {
-
+    public boolean addToSaved(String title) {
+        return false;
     }
 
     @Override
-    public void removeFromSaved(String title) {
-
+    public boolean removeFromSaved(String title) {
+        return false;
     }
 
     @Override

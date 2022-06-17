@@ -38,7 +38,7 @@ Theme song that plays on a loop, with requisite play/pause button. <br>
 Distinction Extra Feature: <br>
 Progress indicator will spin with api call is initiated, and then turn to done with a check mark when the call is finished. <br>
 
-Exam implementation details: <br>
+**Exam implementation details:** <br>
 New shortcuts have been added: <br>
 Ctrl + J to add a selected article to the saved list <br>
 Ctrl + K to remove a selected article from the saved list <br>
@@ -56,6 +56,8 @@ In order to save an article to your saved list: <br>
 In order to delete an article from your saved list: <br>
  - Single left-click or hover using tab+arrow keys on the article you are interested in removing (from the saved articles list) <br>
  - Use the "Delete from saved list" button or use the corresponding shortcut <br>
+
+Note: newly added articles to the saved list will be added to the very end of the list every time <br>
 
 Citations: <br>
 Task 3 for inspiration for setting up GUI and keyboard shortcuts <br>

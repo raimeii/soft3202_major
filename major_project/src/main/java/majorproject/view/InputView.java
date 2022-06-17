@@ -99,8 +99,7 @@ public class InputView {
         TextField textField = new TextField();
         textField.setPromptText("Enter your tag here");
 
-        textField.setPrefWidth(500);
-        textField.setMaxWidth(500);
+        textField.setPrefWidth(900);
         textField.setOnAction(event ->  {
             lookUp();
         });
@@ -298,23 +297,18 @@ public class InputView {
     }
 
     public void addToSaved() {
-        try {
-            String title = resultOutputField.getSelectionModel().getSelectedItem();
-            model.addToSavedArticles(title);
+        String title = resultOutputField.getSelectionModel().getSelectedItem();
+        if (model.addToSavedArticles(title)) {
             clearAndUpdateSaved();
-        } catch (InvalidParameterException ignored) {
-            ;
         }
+
 
     }
 
     public void removeFromSaved() {
-        try {
-            String title = savedArticleField.getSelectionModel().getSelectedItem();
-            model.removeFromSavedArticles(title);
+        String title = savedArticleField.getSelectionModel().getSelectedItem();
+        if (model.removeFromSavedArticles(title)) {
             clearAndUpdateSaved();
-        } catch (InvalidParameterException ignored) {
-            ;
         }
     }
 

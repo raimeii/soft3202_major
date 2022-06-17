@@ -166,23 +166,31 @@ public class OnlineGuardianHandlerImpl implements GuardianHandler {
     }
 
     @Override
-    public void addToSaved(String title) {
+    public boolean addToSaved(String title) {
         if (title == null) {
-            throw new InvalidParameterException("Web title is null");
+            return false;
         }
         for (ResultsPOJO result: tagResults) {
             if (result.toString().equals(title)) {
                 savedResults.add(result);
+                return true;
             }
         }
+        return false;
     }
 
     @Override
-    public void removeFromSaved(String title) {
+    public boolean removeFromSaved(String title) {
         if (title == null) {
-            throw new InvalidParameterException("Web title is null");
+            return false;
         }
-        savedResults.removeIf(result -> result.toString().equals(title));
+        for (ResultsPOJO result: savedResults) {
+            if (result.toString().equals(title)) {
+                savedResults.remove(result);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -191,7 +199,6 @@ public class OnlineGuardianHandlerImpl implements GuardianHandler {
         for (ResultsPOJO results: savedResults) {
             ret.add(results.toString());
         }
-        Collections.sort(ret);
         return ret;
     }
 

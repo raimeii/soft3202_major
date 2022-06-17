@@ -55,11 +55,30 @@ public interface GuardianHandler {
 
     //exam new features
 
+    /**
+     * Retrieves the URL of the ResultsPOJO object with the matching title from the saved list of results
+     * @param title title of the article we are interested in
+     * @return URL for that particular article
+     */
     String getURLFromSaved(String title);
 
-    void addToSaved(String title);
+    /**
+     * Goes through the current tag search article results and adds the result with the matching title to the saved list of results
+     * @param title title of the article we are interested in
+     * @return true if the operation is successful, false otherwise or if the parameter is null
+     */
+    boolean addToSaved(String title);
 
-    void removeFromSaved(String title);
+    /**
+     * Goes through the current saved articles list and removes the result with the matching title from the list
+     * @param title title of the article we are interested in
+     * @return true if the operation was successful, false otherwise or if the parameter is null
+     */
+    boolean removeFromSaved(String title);
 
+    /**
+     * Returns the string representation (title) of each result stored in the savedResults list
+     * @return string list of article titles
+     */
     ArrayList<String> getResultsFromSaved();
 }
