@@ -32,7 +32,27 @@ public class OfflineGuardianHandlerImpl implements GuardianHandler{
     }
 
     @Override
+    public String getURLFromSaved(String title) {
+        return "https://youtu.be/FvOpPeKSf_4";
+    }
+
+    @Override
     public GuardianPOJO getCurrentTagResponse() {
         return null;
+    }
+
+    @Override
+    public void addToSaved(String title) {
+
+    }
+
+    @Override
+    public void removeFromSaved(String title) {
+
+    }
+
+    @Override
+    public ArrayList<String> getResultsFromSaved() {
+        return new ArrayList<>(List.of("a" , "b", "c", "d" , "1", "2", "3"));
     }
 }

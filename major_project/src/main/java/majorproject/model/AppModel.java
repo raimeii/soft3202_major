@@ -145,5 +145,15 @@ public interface AppModel {
      *
      * @return model's GuardianHandler
      */
-    public GuardianHandler getGuardianHandler();
+    GuardianHandler getGuardianHandler();
+
+
+    //exam new features
+    String getSavedArticleURL(String title);
+
+    void addToSavedArticles(String title);
+
+    void removeFromSavedArticles(String title);
+
+    ArrayList<String> getSavedArticles();
 }

@@ -33,7 +33,9 @@ public class OnlineGuardianHandlerImpl implements GuardianHandler {
     /**
      * List of ResultsPOJOS to refer to when looking for result URLs
      */
-    List<ResultsPOJO> tagResults;
+    private List<ResultsPOJO> tagResults;
+
+    private final List<ResultsPOJO> savedResults = new ArrayList<>();
 
     public OnlineGuardianHandlerImpl(Database d) {
         database = d;
@@ -149,6 +151,49 @@ public class OnlineGuardianHandlerImpl implements GuardianHandler {
         return null;
     }
 
+    //exam implementation
+    @Override
+    public String getURLFromSaved(String title) {
+        if (title == null) {
+            throw new InvalidParameterException("Web title is null");
+        }
+        for (ResultsPOJO result: savedResults) {
+            if (result.toString().equals(title)) {
+                return result.getWebURL();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void addToSaved(String title) {
+        if (title == null) {
+            throw new InvalidParameterException("Web title is null");
+        }
+        for (ResultsPOJO result: tagResults) {
+            if (result.toString().equals(title)) {
+                savedResults.add(result);
+            }
+        }
+    }
+
+    @Override
+    public void removeFromSaved(String title) {
+        if (title == null) {
+            throw new InvalidParameterException("Web title is null");
+        }
+        savedResults.removeIf(result -> result.toString().equals(title));
+    }
+
+    @Override
+    public ArrayList<String> getResultsFromSaved() {
+        ArrayList<String> ret = new ArrayList<>();
+        for (ResultsPOJO results: savedResults) {
+            ret.add(results.toString());
+        }
+        Collections.sort(ret);
+        return ret;
+    }
 
 
 }

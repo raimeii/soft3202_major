@@ -212,4 +212,34 @@ public class AppModelImpl implements AppModel {
     public GuardianHandler getGuardianHandler() {
         return guardianHandler;
     }
+
+
+    //new exam implementations
+    @Override
+    public String getSavedArticleURL(String title) {
+        try {
+            return guardianHandler.getURLFromSaved(title);
+        } catch (InvalidParameterException e) {
+            return "";
+        }
+    }
+
+    @Override
+    public void addToSavedArticles(String title) {
+        guardianHandler.addToSaved(title);
+    }
+
+    @Override
+    public void removeFromSavedArticles(String title) {
+        guardianHandler.removeFromSaved(title);
+    }
+
+    @Override
+    public ArrayList<String> getSavedArticles() {
+        try {
+            return guardianHandler.getResultsFromSaved();
+        } catch (InvalidParameterException e) {
+            return new ArrayList<>();
+        }
+    }
 }

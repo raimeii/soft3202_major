@@ -18,8 +18,8 @@ Milestone 2 Re-Submission: <br>
     SHA: cdb6f14 <br>
     URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/cdb6f14f71df25b1262063855cab5208e480b0cf <br>
 Exam Base Commit: <br>
-    SHA: <> <br>
-    URI: <> <br>
+    SHA: cdb6f14 <br>
+    URI: https://github.sydney.edu.au/abur2581/SCD2_2022/commit/cdb6f14f71df25b1262063855cab5208e480b0cf <br>
 Exam Submission Commit: <br>
     SHA: <> <br>
     URI: <> <br>

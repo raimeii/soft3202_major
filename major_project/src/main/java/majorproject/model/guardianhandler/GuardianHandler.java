@@ -44,10 +44,22 @@ public interface GuardianHandler {
      */
     String getURL(String title);
 
+
+
     /**
      * Returns the GuardianPOJO current tag response
      *
      * @return GuardianPOJO of the current tag response from the api.
      */
     GuardianPOJO getCurrentTagResponse();
+
+    //exam new features
+
+    String getURLFromSaved(String title);
+
+    void addToSaved(String title);
+
+    void removeFromSaved(String title);
+
+    ArrayList<String> getResultsFromSaved();
 }

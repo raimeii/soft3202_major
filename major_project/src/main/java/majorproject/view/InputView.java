@@ -24,6 +24,7 @@ import static javafx.scene.input.KeyCode.ENTER;
 public class InputView {
 
     private final Label prompt = new Label("Search for tag: ");
+    private final Label tagSearchResults = new Label("Tag search results:");
     private TextField inputField;
     private Button lookupButton;
     private Button clearButton;
@@ -45,6 +46,14 @@ public class InputView {
         return t;
     });
 
+    //Exam addition
+    Label savedArticleLabel = new Label("Your currently saved articles:");
+    private ListView<String> savedArticleField;
+
+    private Button saveArticleButton;
+
+    private Button unsaveArticleButton;
+
     public InputView (AppModel model, HostServices hostService) {
         this.model = model;
         this.hostService = hostService;
@@ -53,14 +62,66 @@ public class InputView {
         clearButton = createClearButton();
         tagOutputField = createTagOutputView();
         resultOutputField = createResultOutputView();
+
+        //Exam addition
+        savedArticleField = createSavedArticleField();
+        saveArticleButton = createSaveArticleButton();
+        unsaveArticleButton = createUnsaveArticleButton();
+    }
+
+    private Button createUnsaveArticleButton() {
+        Button unsaveButton = new Button("Delete from saved list");
+        unsaveButton.setOnAction((event -> {
+            ;
+        }));
+        return unsaveButton;
+    }
+
+    private Button createSaveArticleButton() {
+        Button saveButton = new Button("Add to saved list");
+        saveButton.setOnAction((event -> {
+            ;
+        }));
+        return saveButton;
+    }
+
+    private ListView<String> createSavedArticleField() {
+        ListView<String> savedArticleField = new ListView<>();
+        savedArticleField.setPrefWidth(600);
+        savedArticleField.setPrefHeight(250);
+        //set current tag to whatever is clicked
+        savedArticleField.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                ;
+            }
+        });
+
+        savedArticleField.setOnKeyPressed(event -> {
+            if (event.getCode() == ENTER) {
+                ;
+            }
+        });
+        return savedArticleField;
     }
 
 
     public VBox buildInputView() {
+        HBox saveButtons = new HBox(saveArticleButton, unsaveArticleButton);
+        saveButtons.setSpacing(10);
+        VBox saveSection = new VBox(savedArticleLabel, savedArticleField, saveButtons);
+        saveSection.setSpacing(10);
+
         HBox searchField = new HBox(inputField, lookupButton, clearButton, progressIndicator);
         searchField.setSpacing(10);
 
-        VBox viewBox = new VBox(prompt, searchField, tagOutputField, currentTagLabel, resultOutputField);
+        VBox tagOutputBox = new VBox(tagSearchResults, tagOutputField);
+        tagOutputBox.setSpacing(10);
+
+        HBox sideBySidePanels = new HBox(tagOutputBox, saveSection);
+        sideBySidePanels.setSpacing(10);
+
+
+        VBox viewBox = new VBox(prompt, searchField, sideBySidePanels, currentTagLabel, resultOutputField);
         viewBox.setSpacing(10);
 
         return viewBox;
@@ -101,7 +162,7 @@ public class InputView {
 
     public ListView<String> createTagOutputView() {
         ListView<String> tagOutputField = new ListView<>();
-        tagOutputField.setPrefWidth(250);
+        tagOutputField.setPrefWidth(600);
         tagOutputField.setPrefHeight(250);
         //set current tag to whatever is clicked
         tagOutputField.setOnMouseClicked(event -> {
@@ -122,7 +183,9 @@ public class InputView {
         resultOutputField.setPrefHeight(250);
         //set current tag to whatever is clicked
         resultOutputField.setOnMouseClicked(event -> {
-            resultDisplayProcessing();
+            if (event.getClickCount() == 2) {
+                resultDisplayProcessing();
+            }
         });
 
         resultOutputField.setOnKeyPressed(event -> {
